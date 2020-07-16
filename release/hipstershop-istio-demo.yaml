@@ -70,74 +70,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: adservice
-    project: hipstershopistio
-    version: v2
-  name: adservice-v2
-  namespace: hipstershopistio
-spec:
-  minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app: adservice
-      name: adservice-v2
-      project: hipstershopistio
-      version: v2
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: "true"
-      labels:
-        app: adservice
-        name: adservice-v2
-        project: hipstershopistio
-        version: v2
-    spec:
-      containers:
-      - env:
-        - name: BINDDELAY
-          value: 0s
-        - name: CONSECUTIVEERROR
-          value: "0"
-        - name: EXTRA_LATENCY
-          value: 0s
-        - name: LOGLEVEL
-          value: debug
-        - name: SRVURL
-          value: :9555
-        - name: STARTDELAY
-          value: 0s
-        - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
-        image: microservicesdemomesh/adservice2:v0.1.9
-        imagePullPolicy: Always
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 9555
-        name: adservice-v2
-        ports:
-        - containerPort: 9555
-          name: http
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 9555
-        resources:
-          limits:
-            cpu: 300m
-            memory: 300Mi
-          requests:
-            cpu: 200m
-            memory: 180Mi
-      serviceAccountName: adservice-v2
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
     app: apiservice
     project: hipstershopistio
     version: v1
@@ -353,80 +285,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: checkoutservice
-    project: hipstershopistio
-    version: v2
-  name: checkoutservice-v2
-  namespace: hipstershopistio
-spec:
-  minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app: checkoutservice
-      name: checkoutservice-v2
-      project: hipstershopistio
-      version: v2
-  template:
-    metadata:
-      labels:
-        app: checkoutservice
-        name: checkoutservice-v2
-        project: hipstershopistio
-        version: v2
-    spec:
-      containers:
-      - env:
-        - name: CART_SERVICE_ADDR
-          value: cartservice.hipstershopistio:7070
-        - name: CURRENCY_SERVICE_ADDR
-          value: currencyservice.hipstershopistio:7000
-        - name: EMAIL_SERVICE_ADDR
-          value: emailservice.hipstershopistio:8080
-        - name: HEALTH_PORT
-          value: "5052"
-        - name: PAYMENT_SERVICE_ADDR
-          value: paymentservice.hipstershopistio:50051
-        - name: PORT
-          value: "5050"
-        - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: productcatalogservice.hipstershopistio:3550
-        - name: SHIPPING_SERVICE_ADDR
-          value: shippingservice.hipstershopistio:50051
-        - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
-        image: microservicesdemomesh/checkoutservice:v0.1.9
-        imagePullPolicy: Always
-        livenessProbe:
-          exec:
-            command:
-            - /bin/grpc_health_probe
-            - -addr=:5052
-        name: checkoutservice-v2
-        ports:
-        - containerPort: 5050
-          name: grpc
-        - containerPort: 5052
-          name: health
-        readinessProbe:
-          exec:
-            command:
-            - /bin/grpc_health_probe
-            - -addr=:5052
-        resources:
-          limits:
-            cpu: 200m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 64Mi
-      serviceAccountName: checkoutservice-v2
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
     app: currencyservice
     project: hipstershopistio
     version: v1
@@ -622,81 +480,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: frontend
-    project: hipstershopistio
-    version: v2
-  name: frontend-v2
-  namespace: hipstershopistio
-spec:
-  minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app: frontend
-      name: frontend-v2
-      project: hipstershopistio
-      version: v2
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: "true"
-      labels:
-        app: frontend
-        name: frontend-v2
-        project: hipstershopistio
-        version: v2
-    spec:
-      containers:
-      - env:
-        - name: AD_SERVICE_ADDR
-          value: adservice.hipstershopistio:9555
-        - name: CART_SERVICE_ADDR
-          value: cartservice.hipstershopistio:7070
-        - name: CHECKOUT_SERVICE_ADDR
-          value: checkoutservice.hipstershopistio:5050
-        - name: CURRENCY_SERVICE_ADDR
-          value: currencyservice.hipstershopistio:7000
-        - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: productcatalogservice.hipstershopistio:3550
-        - name: RECOMMENDATION_SERVICE_ADDR
-          value: recommendationservice.hipstershopistio:8080
-        - name: SHIPPING_SERVICE_ADDR
-          value: shippingservice.hipstershopistio:50051
-        - name: SRVURL
-          value: :8080
-        - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
-        - name: BANNER_COLOR
-          value: red
-        image: microservicesdemomesh/frontend:v0.1.9
-        imagePullPolicy: Always
-        livenessProbe:
-          httpGet:
-            httpHeaders:
-            - name: Cookie
-              value: shop_session-id=x-readiness-probe
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 10
-        name: frontend-v2
-        ports:
-        - containerPort: 8080
-          name: http
-        readinessProbe:
-          httpGet:
-            httpHeaders:
-            - name: Cookie
-              value: shop_session-id=x-readiness-probe
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 10
-      serviceAccountName: frontend-v2
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
     app: loadgenerator
     project: hipstershopistio
     version: v1
@@ -870,72 +653,6 @@ spec:
             cpu: 100m
             memory: 64Mi
       serviceAccountName: productcatalogservice
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: productcatalogservice
-    project: hipstershopistio
-    version: v2
-  name: productcatalogservice-slow
-  namespace: hipstershopistio
-spec:
-  minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app: productcatalogservice
-      name: productcatalogservice-slow
-      project: hipstershopistio
-      version: v2
-  template:
-    metadata:
-      labels:
-        app: productcatalogservice
-        name: productcatalogservice-slow
-        project: hipstershopistio
-        version: v2
-    spec:
-      containers:
-      - env:
-        - name: DEMO_DEPLOYMENT_ENV_VAR
-          value: none
-        - name: HEALTH_PORT
-          value: "3552"
-        - name: PORT
-          value: "3550"
-        - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
-        - name: EXTRA_LATENCY
-          value: 1.5s
-        image: microservicesdemomesh/productcatalogservice:v0.1.9
-        imagePullPolicy: Always
-        livenessProbe:
-          exec:
-            command:
-            - /bin/grpc_health_probe
-            - -addr=:3552
-        name: productcatalogservice-slow
-        ports:
-        - containerPort: 3550
-          name: grpc
-        - containerPort: 3552
-          name: health
-        readinessProbe:
-          exec:
-            command:
-            - /bin/grpc_health_probe
-            - -addr=:3552
-        resources:
-          limits:
-            cpu: 200m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 64Mi
-      serviceAccountName: productcatalogservice-slow
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1389,12 +1106,6 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: adservice-v2
-  namespace: hipstershopistio
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
   name: apiservice
   namespace: hipstershopistio
 ---
@@ -1408,12 +1119,6 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: checkoutservice
-  namespace: hipstershopistio
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: checkoutservice-v2
   namespace: hipstershopistio
 ---
 apiVersion: v1
@@ -1437,12 +1142,6 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: frontend-v2
-  namespace: hipstershopistio
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
   name: loadgenerator
   namespace: hipstershopistio
 ---
@@ -1456,12 +1155,6 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: productcatalogservice
-  namespace: hipstershopistio
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: productcatalogservice-slow
   namespace: hipstershopistio
 ---
 apiVersion: v1
