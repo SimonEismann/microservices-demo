@@ -508,9 +508,7 @@ spec:
       containers:
       - env:
         - name: FRONTEND_ADDR
-          value: https://hipstershop.add-your-ip.sslip.io
-        - name: FRONTEND_IP
-          value: add-your-ip
+          value: http://frontend:8080
         - name: PYTHONWARNINGS
           value: ignore
         - name: USERS

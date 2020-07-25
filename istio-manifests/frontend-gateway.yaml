@@ -21,7 +21,7 @@ spec:
     istio: ingressgateway # use Istio default gateway implementation
   servers:
   - port:
-      number: 80
+      number: 8080
       name: http
       protocol: HTTP
     hosts:
@@ -41,4 +41,4 @@ spec:
     - destination:
         host: frontend
         port:
-          number: 80
+          number: 8080
