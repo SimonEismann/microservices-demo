@@ -6,7 +6,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: adservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -74,7 +74,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: apiservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -98,23 +98,23 @@ spec:
       containers:
       - env:
         - name: AD_SERVICE_ADDR
-          value: adservice.hipstershopistio:9555
+          value: adservice:9555
         - name: API_VERSION
           value: v1
         - name: CART_SERVICE_ADDR
-          value: cartservice.hipstershopistio:7070
+          value: cartservice:7070
         - name: CHECKOUT_SERVICE_ADDR
-          value: checkoutservice.hipstershopistio:5050
+          value: checkoutservice:5050
         - name: CURRENCY_SERVICE_ADDR
-          value: currencyservice.hipstershopistio:7000
+          value: currencyservice:7000
         - name: PORT
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: productcatalogservice.hipstershopistio:3550
+          value: productcatalogservice:3550
         - name: RECOMMENDATION_SERVICE_ADDR
-          value: recommendationservice.hipstershopistio:8080
+          value: recommendationservice:8080
         - name: SHIPPING_SERVICE_ADDR
-          value: shippingservice.hipstershopistio:50051
+          value: shippingservice:50051
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
         image: microservicesdemomesh/apiservice:v0.1.9
@@ -149,7 +149,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: cartservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -175,7 +175,7 @@ spec:
         - name: PORT
           value: "7070"
         - name: REDIS_ADDR
-          value: redis-cart.hipstershopistio:6379
+          value: redis-cart:6379
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
         image: microservicesdemomesh/cartservice:v0.1.9
@@ -215,7 +215,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: checkoutservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -237,21 +237,21 @@ spec:
       containers:
       - env:
         - name: CART_SERVICE_ADDR
-          value: cartservice.hipstershopistio:7070
+          value: cartservice:7070
         - name: CURRENCY_SERVICE_ADDR
-          value: currencyservice.hipstershopistio:7000
+          value: currencyservice:7000
         - name: EMAIL_SERVICE_ADDR
-          value: emailservice.hipstershopistio:8080
+          value: emailservice:8080
         - name: HEALTH_PORT
           value: "5052"
         - name: PAYMENT_SERVICE_ADDR
-          value: paymentservice.hipstershopistio:50051
+          value: paymentservice:50051
         - name: PORT
           value: "5050"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: productcatalogservice.hipstershopistio:3550
+          value: productcatalogservice:3550
         - name: SHIPPING_SERVICE_ADDR
-          value: shippingservice.hipstershopistio:50051
+          value: shippingservice:50051
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
         image: microservicesdemomesh/checkoutservice:v0.1.9
@@ -289,7 +289,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: currencyservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -347,7 +347,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: emailservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -411,7 +411,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: frontend
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -435,19 +435,19 @@ spec:
       containers:
       - env:
         - name: AD_SERVICE_ADDR
-          value: adservice.hipstershopistio:9555
+          value: adservice:9555
         - name: CART_SERVICE_ADDR
-          value: cartservice.hipstershopistio:7070
+          value: cartservice:7070
         - name: CHECKOUT_SERVICE_ADDR
-          value: checkoutservice.hipstershopistio:5050
+          value: checkoutservice:5050
         - name: CURRENCY_SERVICE_ADDR
-          value: currencyservice.hipstershopistio:7000
+          value: currencyservice:7000
         - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: productcatalogservice.hipstershopistio:3550
+          value: productcatalogservice:3550
         - name: RECOMMENDATION_SERVICE_ADDR
-          value: recommendationservice.hipstershopistio:8080
+          value: recommendationservice:8080
         - name: SHIPPING_SERVICE_ADDR
-          value: shippingservice.hipstershopistio:50051
+          value: shippingservice:50051
         - name: SRVURL
           value: :8080
         - name: ZIPKIN_SERVICE_ADDR
@@ -484,7 +484,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: loadgenerator
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -540,7 +540,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: paymentservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -598,7 +598,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: productcatalogservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -662,7 +662,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: recommendationservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -690,7 +690,7 @@ spec:
         - name: PORT
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: productcatalogservice.hipstershopistio:3550
+          value: productcatalogservice:3550
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
         image: microservicesdemomesh/recommendationservice:v0.1.9
@@ -728,7 +728,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: redis-cart
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -788,7 +788,7 @@ metadata:
     project: hipstershopistio
     version: v1
   name: shippingservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -851,7 +851,7 @@ metadata:
     project: hipstershopistio
     service: adservice
   name: adservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: http-adservice
@@ -871,7 +871,7 @@ metadata:
     project: hipstershopistio
     service: apiservice
   name: apiservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: http-apiservice
@@ -891,7 +891,7 @@ metadata:
     project: hipstershopistio
     service: cartservice
   name: cartservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: grpc-cartservice
@@ -911,7 +911,7 @@ metadata:
     project: hipstershopistio
     service: checkoutservice
   name: checkoutservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: grpc-checkoutservice
@@ -934,7 +934,7 @@ metadata:
     project: hipstershopistio
     service: currencyservice
   name: currencyservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: grpc-currencyservice
@@ -954,7 +954,7 @@ metadata:
     project: hipstershopistio
     service: emailservice
   name: emailservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: grpc-emailservice
@@ -977,7 +977,7 @@ metadata:
     project: hipstershopistio
     service: frontend
   name: frontend
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: http-frontend
@@ -997,7 +997,7 @@ metadata:
     project: hipstershopistio
     service: paymentservice
   name: paymentservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: grpc-paymentservice
@@ -1017,7 +1017,7 @@ metadata:
     project: hipstershopistio
     service: productcatalogservice
   name: productcatalogservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: grpc-productcatalogservice
@@ -1040,7 +1040,7 @@ metadata:
     project: hipstershopistio
     service: recommendationservice
   name: recommendationservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: grpc-recommendationservice
@@ -1063,7 +1063,7 @@ metadata:
     project: hipstershopistio
     service: redis-cart
   name: redis-cart
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: redis-redis-cart
@@ -1083,7 +1083,7 @@ metadata:
     project: hipstershopistio
     service: shippingservice
   name: shippingservice
-  namespace: hipstershopistio
+  namespace: default
 spec:
   ports:
   - name: grpc-shippingservice
@@ -1101,76 +1101,76 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: adservice
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: apiservice
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cartservice
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: checkoutservice
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: currencyservice
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: emailservice
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: frontend
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: loadgenerator
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: paymentservice
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: productcatalogservice
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: recommendationservice
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: redis-cart
-  namespace: hipstershopistio
+  namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: shippingservice
-  namespace: hipstershopistio
+  namespace: default
