@@ -42,7 +42,7 @@ spec:
         - name: STARTDELAY
           value: 0s
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/adservice2:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -116,7 +116,7 @@ spec:
         - name: SHIPPING_SERVICE_ADDR
           value: shippingservice:50051
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/apiservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -177,7 +177,7 @@ spec:
         - name: REDIS_ADDR
           value: redis-cart:6379
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/cartservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -253,7 +253,7 @@ spec:
         - name: SHIPPING_SERVICE_ADDR
           value: shippingservice:50051
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/checkoutservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -313,7 +313,7 @@ spec:
         - name: PORT
           value: "7000"
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/currencyservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -375,7 +375,7 @@ spec:
         - name: PORT
           value: "8080"
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/emailservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -451,7 +451,7 @@ spec:
         - name: SRVURL
           value: :8080
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/frontend:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -514,7 +514,7 @@ spec:
         - name: USERS
           value: "10"
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/loadgenerator:v0.1.9
         imagePullPolicy: Always
         name: loadgenerator
@@ -562,7 +562,7 @@ spec:
         - name: PORT
           value: "50051"
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/paymentservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -624,7 +624,7 @@ spec:
         - name: PORT
           value: "3550"
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/productcatalogservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -690,7 +690,7 @@ spec:
         - name: PRODUCT_CATALOG_SERVICE_ADDR
           value: productcatalogservice:3550
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/recommendationservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
@@ -748,7 +748,7 @@ spec:
       containers:
       - env:
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: docker.io/library/redis:alpine
         imagePullPolicy: Always
         livenessProbe:
@@ -812,7 +812,7 @@ spec:
         - name: PORT
           value: "50051"
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 35.224.193.198:9411
         image: microservicesdemomesh/shippingservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
