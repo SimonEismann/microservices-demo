@@ -49,4 +49,5 @@ echo "$INGRESS_HOST"
 
 # dashboard
 istioctl dashboard kiali # username=admin, password=admin, kiali graph filter: hide -> name*=whitelist OR name*=Passthrough
+istioctl dashboard zipkin
 ```
