@@ -738,7 +738,7 @@ spec:
           value: "50051"
         - name: ZIPKIN_SERVICE_ADDR
           value: 34.66.47.238:9411
-        image: simoneismann/shippingservice:v0.1.9
+        image: simoneismann/shippingservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
