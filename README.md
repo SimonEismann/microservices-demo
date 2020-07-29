@@ -37,7 +37,7 @@ gcloud services enable containerregistry.googleapis.com
 gcloud auth configure-docker -q
 gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project $PROJECT_ID
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value core/account)
-istioctl install --set profile=demo --set values.tracing.enabled=true --set values.tracing.provider=zipkin
+istioctl install --set profile=demo --set values.global.tracer.zipkin.address=35.224.193.198:9411 # all .default services are istio-generated
 cd ..
 cd se-microservices-demo/
 kubectl label namespace default istio-injection=enabled

@@ -43,7 +43,7 @@ spec:
           value: 0s
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/adservice2:v0.1.9
+        image: simoneismann/adservice:master
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -103,7 +103,7 @@ spec:
           value: redis-cart:6379
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/cartservice:v0.1.9
+        image: simoneismann/cartservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -179,7 +179,7 @@ spec:
           value: shippingservice:50051
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/checkoutservice:v0.1.9
+        image: simoneismann/checkoutservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -239,7 +239,7 @@ spec:
           value: "7000"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/currencyservice:v0.1.9
+        image: simoneismann/currencyservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -301,7 +301,7 @@ spec:
           value: "8080"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/emailservice:v0.1.9
+        image: simoneismann/emailservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -377,7 +377,7 @@ spec:
           value: :8080
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/frontend:v0.1.9
+        image: simoneismann/frontend:master
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -440,7 +440,7 @@ spec:
           value: "10"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/loadgenerator:v0.1.9
+        image: simoneismann/loadgenerator:master
         imagePullPolicy: Always
         name: loadgenerator
         ports:
@@ -488,7 +488,7 @@ spec:
           value: "50051"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/paymentservice:v0.1.9
+        image: simoneismann/paymentservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -550,7 +550,7 @@ spec:
           value: "3550"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/productcatalogservice:v0.1.9
+        image: simoneismann/productcatalogservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -616,7 +616,7 @@ spec:
           value: productcatalogservice:3550
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin.istio-system:9411
-        image: simoneismann/recommendationservice:v0.1.9
+        image: simoneismann/recommendationservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -673,7 +673,7 @@ spec:
       containers:
       - env:
         - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin.istio-system:9411
+          value: 34.66.47.238:9411
         image: docker.io/library/redis:alpine
         imagePullPolicy: Always
         livenessProbe:
