@@ -31,6 +31,8 @@ spec:
       - env:
         - name: BINDDELAY
           value: 0s
+        - name: PORT
+          value: 9555
         - name: CONSECUTIVEERROR
           value: "0"
         - name: EXTRA_LATENCY
