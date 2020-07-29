@@ -1,5 +1,5 @@
 # Hipster Shop: Cloud-Native Microservices Demo Application
-
+ 
 This repo is a fork of http://go/microservices-demo with modifications to suite the Tetrate Service Bridge.
 
 ## building images

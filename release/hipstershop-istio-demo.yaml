@@ -42,8 +42,8 @@ spec:
         - name: STARTDELAY
           value: 0s
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/adservice2:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/adservice:master
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -65,81 +65,6 @@ spec:
             cpu: 200m
             memory: 180Mi
       serviceAccountName: adservice
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: apiservice
-    project: hipstershopistio
-    version: v1
-  name: apiservice
-  namespace: default
-spec:
-  minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app: apiservice
-      name: apiservice
-      project: hipstershopistio
-      version: v1
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/rewriteAppHTTPProbers: "true"
-      labels:
-        app: apiservice
-        name: apiservice
-        project: hipstershopistio
-        version: v1
-    spec:
-      containers:
-      - env:
-        - name: AD_SERVICE_ADDR
-          value: adservice:9555
-        - name: API_VERSION
-          value: v1
-        - name: CART_SERVICE_ADDR
-          value: cartservice:7070
-        - name: CHECKOUT_SERVICE_ADDR
-          value: checkoutservice:5050
-        - name: CURRENCY_SERVICE_ADDR
-          value: currencyservice:7000
-        - name: PORT
-          value: "8080"
-        - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: productcatalogservice:3550
-        - name: RECOMMENDATION_SERVICE_ADDR
-          value: recommendationservice:8080
-        - name: SHIPPING_SERVICE_ADDR
-          value: shippingservice:50051
-        - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/apiservice:v0.1.9
-        imagePullPolicy: Always
-        livenessProbe:
-          httpGet:
-            httpHeaders:
-            - name: Cookie
-              value: shop_session-id=x-readiness-probe
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 10
-        name: apiservice
-        ports:
-        - containerPort: 8080
-          name: http
-        readinessProbe:
-          httpGet:
-            httpHeaders:
-            - name: Cookie
-              value: shop_session-id=x-readiness-probe
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 10
-      serviceAccountName: apiservice
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -177,8 +102,8 @@ spec:
         - name: REDIS_ADDR
           value: redis-cart:6379
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/cartservice:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/cartservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -253,8 +178,8 @@ spec:
         - name: SHIPPING_SERVICE_ADDR
           value: shippingservice:50051
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/checkoutservice:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/checkoutservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -313,8 +238,8 @@ spec:
         - name: PORT
           value: "7000"
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/currencyservice:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/currencyservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -375,8 +300,8 @@ spec:
         - name: PORT
           value: "8080"
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/emailservice:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/emailservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -451,8 +376,8 @@ spec:
         - name: SRVURL
           value: :8080
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/frontend:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/frontend:master
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
@@ -514,8 +439,8 @@ spec:
         - name: USERS
           value: "10"
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/loadgenerator:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/loadgenerator:master
         imagePullPolicy: Always
         name: loadgenerator
         ports:
@@ -562,8 +487,8 @@ spec:
         - name: PORT
           value: "50051"
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/paymentservice:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/paymentservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -624,8 +549,8 @@ spec:
         - name: PORT
           value: "3550"
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/productcatalogservice:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/productcatalogservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -690,8 +615,8 @@ spec:
         - name: PRODUCT_CATALOG_SERVICE_ADDR
           value: productcatalogservice:3550
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/recommendationservice:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/recommendationservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -812,8 +737,8 @@ spec:
         - name: PORT
           value: "50051"
         - name: ZIPKIN_SERVICE_ADDR
-          value: 34.66.47.238:9411
-        image: microservicesdemomesh/shippingservice:v0.1.9
+          value: zipkin.istio-system:9411
+        image: simoneismann/shippingservice:v0.1.9
         imagePullPolicy: Always
         livenessProbe:
           exec:
@@ -857,26 +782,6 @@ spec:
     targetPort: 9555
   selector:
     app: adservice
-    project: hipstershopistio
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: apiservice
-    name: apiservice
-    project: hipstershopistio
-    service: apiservice
-  name: apiservice
-  namespace: default
-spec:
-  ports:
-  - name: http-apiservice
-    port: 8080
-    targetPort: 8080
-  selector:
-    app: apiservice
     project: hipstershopistio
   type: ClusterIP
 ---
