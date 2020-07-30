@@ -21,6 +21,8 @@ TAG=v0.1.8 REPO_PREFIX=my.docker.hub ./hack/make-docker-images.sh
 
 # Deployment in Google Cloud Shell
 ```shell
+sudo apt-get install mariadb-client
+
 # install files
 curl -L https://istio.io/downloadIstio | sh - # download newest istio release
 git clone https://github.com/SimonEismann/microservices-demo se-microservices-demo
@@ -49,4 +51,10 @@ echo "$INGRESS_HOST"
 
 # dashboard
 istioctl dashboard kiali # username=admin, password=admin, kiali graph filter: hide -> name*=whitelist OR name*=Passthrough
+
+# dump all zipkin tables as csv: https://stackoverflow.com/questions/12040816/dump-all-tables-in-csv-format-using-mysqldump
+# mysql -h or --host=localhost for remote host
+for tb in $(mysql --protocol=tcp -pzipkin -uzipkin zipkin -sN -e "SHOW TABLES;"); do
+    mysql -B --protocol=tcp -pzipkin -uzipkin zipkin -e "SELECT * FROM ${tb};" | sed "s/\"/\"\"/g;s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" > ${tb}.csv;
+done
 ```
