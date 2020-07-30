@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: emailservice
+    project: hipstershopistio
+    version: v1
+  name: emailservice
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: emailservice
+      name: emailservice
+      project: hipstershopistio
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: emailservice
+        name: emailservice
+        project: hipstershopistio
+        version: v1
+    spec:
+      containers:
+      - env:
+        - name: ENABLE_PROFILER
+          value: "0"
+        - name: HEALTH_PORT
+          value: "8081"
+        - name: PORT
+          value: "8080"
+        - name: ZIPKIN_SERVICE_ADDR
+          value: zipkin:9411
+        image: simoneismann/emailservice:master
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:8081
+        name: emailservice
+        ports:
+        - containerPort: 8080
+          name: grpc
+        - containerPort: 8081
+          name: health
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:8081
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+      serviceAccountName: emailservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: emailservice
+    name: emailservice
+    project: hipstershopistio
+    service: emailservice
+  name: emailservice
+  namespace: default
+spec:
+  ports:
+  - name: grpc-emailservice
+    port: 8080
+    targetPort: 8080
+  - name: health-emailservice
+    port: 8081
+    targetPort: 8081
+  selector:
+    app: emailservice
+    project: hipstershopistio
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: emailservice
+  namespace: default

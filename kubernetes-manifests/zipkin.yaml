@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Pod
+metadata:
+  labels:
+    app: zipkin
+    project: hipstershopistio
+    version: v1
+  name: zipkin
+  namespace: default
+spec:
+  containers:
+    -name: zipkin
+     env:
+      - name: STORAGE_TYPE
+        value: mysql
+      - name: MYSQL_HOST
+        value: mysql
+     image: openzipkin/zipkin
+     imagePullPolicy: Always   
+     ports:
+      - containerPort: 9411

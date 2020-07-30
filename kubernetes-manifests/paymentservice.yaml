@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: paymentservice
+    project: hipstershopistio
+    version: v1
+  name: paymentservice
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: paymentservice
+      name: paymentservice
+      project: hipstershopistio
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: paymentservice
+        name: paymentservice
+        project: hipstershopistio
+        version: v1
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "50051"
+        - name: ZIPKIN_SERVICE_ADDR
+          value: zipkin:9411
+        image: simoneismann/paymentservice:master
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:50051
+        name: paymentservice
+        ports:
+        - containerPort: 50051
+          name: grpc
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:50051
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+      serviceAccountName: paymentservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: paymentservice
+    name: paymentservice
+    project: hipstershopistio
+    service: paymentservice
+  name: paymentservice
+  namespace: default
+spec:
+  ports:
+  - name: grpc-paymentservice
+    port: 50051
+    targetPort: 50051
+  selector:
+    app: paymentservice
+    project: hipstershopistio
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: paymentservice
+  namespace: default

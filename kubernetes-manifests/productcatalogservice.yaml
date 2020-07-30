@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: productcatalogservice
+    project: hipstershopistio
+    version: v1
+  name: productcatalogservice
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: productcatalogservice
+      name: productcatalogservice
+      project: hipstershopistio
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: productcatalogservice
+        name: productcatalogservice
+        project: hipstershopistio
+        version: v1
+    spec:
+      containers:
+      - env:
+        - name: DEMO_DEPLOYMENT_ENV_VAR
+          value: none
+        - name: HEALTH_PORT
+          value: "3552"
+        - name: PORT
+          value: "3550"
+        - name: ZIPKIN_SERVICE_ADDR
+          value: zipkin:9411
+        image: simoneismann/productcatalogservice:master
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:3552
+        name: productcatalogservice
+        ports:
+        - containerPort: 3550
+          name: grpc
+        - containerPort: 3552
+          name: health
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:3552
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+      serviceAccountName: productcatalogservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: productcatalogservice
+    name: productcatalogservice
+    project: hipstershopistio
+    service: productcatalogservice
+  name: productcatalogservice
+  namespace: default
+spec:
+  ports:
+  - name: grpc-productcatalogservice
+    port: 3550
+    targetPort: 3550
+  - name: health-productcatalogservice
+    port: 3552
+    targetPort: 3552
+  selector:
+    app: productcatalogservice
+    project: hipstershopistio
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: productcatalogservice
+  namespace: default

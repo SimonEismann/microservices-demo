@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Pod
+metadata:
+  labels:
+    app: mysql
+    project: hipstershopistio
+    version: v1
+  name: mysql
+  namespace: default
+spec:
+  containers:
+    -name: mysql
+     image: openzipkin/zipkin-mysql
+     imagePullPolicy: Always   
+     ports:
+      - containerPort: 3306

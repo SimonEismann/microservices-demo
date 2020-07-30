@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: recommendationservice
+    project: hipstershopistio
+    version: v1
+  name: recommendationservice
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: recommendationservice
+      name: recommendationservice
+      project: hipstershopistio
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: recommendationservice
+        name: recommendationservice
+        project: hipstershopistio
+        version: v1
+    spec:
+      containers:
+      - env:
+        - name: ENABLE_PROFILER
+          value: "0"
+        - name: HEALTH_PORT
+          value: "8081"
+        - name: PORT
+          value: "8080"
+        - name: PRODUCT_CATALOG_SERVICE_ADDR
+          value: productcatalogservice:3550
+        - name: ZIPKIN_SERVICE_ADDR
+          value: zipkin:9411
+        image: simoneismann/recommendationservice:master
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:8081
+        name: recommendationservice
+        ports:
+        - containerPort: 8080
+          name: grpc
+        - containerPort: 8081
+          name: health
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:8081
+        resources:
+          limits:
+            cpu: 200m
+            memory: 450Mi
+          requests:
+            cpu: 100m
+            memory: 220Mi
+      serviceAccountName: recommendationservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: recommendationservice
+    name: recommendationservice
+    project: hipstershopistio
+    service: recommendationservice
+  name: recommendationservice
+  namespace: default
+spec:
+  ports:
+  - name: grpc-recommendationservice
+    port: 8080
+    targetPort: 8080
+  - name: health-recommendationservice
+    port: 8081
+    targetPort: 8081
+  selector:
+    app: recommendationservice
+    project: hipstershopistio
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: recommendationservice
+  namespace: default

@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: shippingservice
+    project: hipstershopistio
+    version: v1
+  name: shippingservice
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: shippingservice
+      name: shippingservice
+      project: hipstershopistio
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: shippingservice
+        name: shippingservice
+        project: hipstershopistio
+        version: v1
+    spec:
+      containers:
+      - env:
+        - name: HEALTH_PORT
+          value: "50053"
+        - name: PORT
+          value: "50051"
+        - name: ZIPKIN_SERVICE_ADDR
+          value: zipkin:9411
+        image: simoneismann/shippingservice:master
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:50053
+        name: shippingservice
+        ports:
+        - containerPort: 50051
+          name: grpc
+        - containerPort: 50053
+          name: health
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:50053
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+      serviceAccountName: shippingservice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: shippingservice
+    name: shippingservice
+    project: hipstershopistio
+    service: shippingservice
+  name: shippingservice
+  namespace: default
+spec:
+  ports:
+  - name: grpc-shippingservice
+    port: 50051
+    targetPort: 50051
+  - name: health-shippingservice
+    port: 50053
+    targetPort: 50053
+  selector:
+    app: shippingservice
+    project: hipstershopistio
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: shippingservice
+  namespace: default

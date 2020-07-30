@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: loadgenerator
+    project: hipstershopistio
+    version: v1
+  name: loadgenerator
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: loadgenerator
+      name: loadgenerator
+      project: hipstershopistio
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: loadgenerator
+        name: loadgenerator
+        project: hipstershopistio
+        version: v1
+    spec:
+      containers:
+      - env:
+        - name: FRONTEND_ADDR
+          value: http://frontend:8080
+        - name: PYTHONWARNINGS
+          value: ignore
+        - name: USERS
+          value: "10"
+        - name: ZIPKIN_SERVICE_ADDR
+          value: zipkin:9411
+        image: simoneismann/loadgenerator:master
+        imagePullPolicy: Always
+        name: loadgenerator
+        ports:
+        - containerPort: 8089
+          name: http
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 300m
+            memory: 256Mi
+      serviceAccountName: loadgenerator
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: loadgenerator
+  namespace: default

@@ -37,17 +37,16 @@ gcloud services enable containerregistry.googleapis.com
 gcloud auth configure-docker -q
 gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project $PROJECT_ID
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value core/account)
-istioctl install --set profile=demo --set values.global.tracer.zipkin.address=35.224.193.198:9411 # all .default services are istio-generated
+istioctl install --set profile=demo
 cd ..
 cd se-microservices-demo/
 kubectl label namespace default istio-injection=enabled
 kubectl apply -f ./istio-manifests
-kubectl apply -f ./release/hipstershop-istio-demo.yaml
+kubectl apply -f ./kubernetes-manifests
 istioctl analyze
 INGRESS_HOST="$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
 echo "$INGRESS_HOST"
 
 # dashboard
 istioctl dashboard kiali # username=admin, password=admin, kiali graph filter: hide -> name*=whitelist OR name*=Passthrough
-istioctl dashboard zipkin
 ```
