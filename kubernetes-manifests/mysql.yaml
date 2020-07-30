@@ -24,6 +24,7 @@ spec:
         version: v1
     spec:
       containers:
+      - env:
         image: openzipkin/zipkin-mysql
         imagePullPolicy: Always
         name: mysql
