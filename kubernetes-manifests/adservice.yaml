@@ -43,7 +43,7 @@ spec:
           value: 0s
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneinsmann/adservice2:master
+        image: simoneismann/adservice2:master
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
