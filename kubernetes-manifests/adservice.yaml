@@ -55,7 +55,6 @@ spec:
         name: adservice
         ports:
         - containerPort: 9555
-          name: http
         readinessProbe:
           initialDelaySeconds: 20
           periodSeconds: 15
