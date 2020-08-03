@@ -31,8 +31,6 @@ spec:
       - env:
         - name: BINDDELAY
           value: 0s
-        - name: PORT
-          value: "9555"
         - name: CONSECUTIVEERROR
           value: "0"
         - name: EXTRA_LATENCY
@@ -45,21 +43,20 @@ spec:
           value: 0s
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/adservice:master
+        image: simoneinsmann/adservice2:master
         imagePullPolicy: Always
         livenessProbe:
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:9555"]
+          httpGet:
+            path: /healthz
+            port: 9555
         name: adservice
         ports:
         - containerPort: 9555
+          name: http
         readinessProbe:
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          exec:
-            command: ["/bin/grpc_health_probe", "-addr=:9555"]
+          httpGet:
+            path: /healthz
+            port: 9555
         resources:
           limits:
             cpu: 300m
@@ -81,7 +78,7 @@ metadata:
   namespace: default
 spec:
   ports:
-  - name: http-adservice
+  - name: http
     port: 9555
     targetPort: 9555
   selector:
