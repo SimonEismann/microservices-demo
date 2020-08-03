@@ -53,7 +53,7 @@ const (
 var (
 	version               = "no version set"
 	displayVersion        = flag.Bool("version", false, "Show version and quit")
-	logLevel              = flag.String("logLevel", "warn", "log level from debug, info, warning, error. When debug, genetate 100% Tracing")
+	logLevel              = flag.String("logLevel", "debug", "log level from debug, info, warning, error. When debug, genetate 100% Tracing")
 	srvURL                = flag.String("srvURL", ":8080", "IP and port to bind, localhost:8080 or :8080")
 	productCatalogSvcAddr = flag.String("PRODUCT_CATALOG_SERVICE_ADDR", "productcatalogservice:3550", "URL to productCatalog service")
 	currencySvcAddr       = flag.String("CURRENCY_SERVICE_ADDR", "currencyservice:7000", "URL to Currency service")
