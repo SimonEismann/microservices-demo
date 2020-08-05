@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using cartservice.interfaces;
 using Grpc.Core;
 using Hipstershop;
+using zipkin4net;
 using static Hipstershop.CartService;
 
 namespace cartservice
@@ -36,19 +37,35 @@ namespace cartservice
 
         public async override Task<Empty> AddItem(AddItemRequest request, Grpc.Core.ServerCallContext context)
         {
+			var trace = Trace.Create();
+			trace.Record(Annotations.ServerRecv());
+			trace.Record(Annotations.ServiceName("cartservice"));
+			trace.Record(Annotations.Tag("grpc.path", "cartservice/AddItem"));
             await cartStore.AddItemAsync(request.UserId, request.Item.ProductId, request.Item.Quantity);
+			trace.Record(Annotations.ServerSend());
             return Empty;
         }
 
         public async override Task<Empty> EmptyCart(EmptyCartRequest request, ServerCallContext context)
         {
+			var trace = Trace.Create();
+			trace.Record(Annotations.ServerRecv());
+			trace.Record(Annotations.ServiceName("cartservice"));
+			trace.Record(Annotations.Tag("grpc.path", "cartservice/EmptyCart"));
             await cartStore.EmptyCartAsync(request.UserId);
+			trace.Record(Annotations.ServerSend());
             return Empty;
         }
 
         public override Task<Hipstershop.Cart> GetCart(GetCartRequest request, ServerCallContext context)
         {
-            return cartStore.GetCartAsync(request.UserId);
+			var trace = Trace.Create();
+			trace.Record(Annotations.ServerRecv());
+			trace.Record(Annotations.ServiceName("cartservice"));
+			trace.Record(Annotations.Tag("grpc.path", "cartservice/GetCart"));
+			var cart = await cartStore.GetCartAsync(request.UserId);
+			trace.Record(Annotations.ServerSend());
+            return cart;
         }
     }
 }

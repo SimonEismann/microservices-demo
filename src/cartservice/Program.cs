@@ -21,6 +21,9 @@ using cartservice.interfaces;
 using CommandLine;
 using Grpc.Core;
 using Microsoft.Extensions.Configuration;
+using zipkin4net;
+using zipkin4net.Tracers.Zipkin;
+using zipkin4net.Transport.Http;
 
 namespace cartservice
 {
@@ -29,6 +32,7 @@ namespace cartservice
         const string CART_SERVICE_ADDRESS = "LISTEN_ADDR";
         const string REDIS_ADDRESS = "REDIS_ADDR";
         const string CART_SERVICE_PORT = "PORT";
+		const string ZIPKIN_SERVICE_ADDRESS = "ZIPKIN_SERVICE_ADDR";
 
         [Verb("start", HelpText = "Starts the server listening on provided port")]
         class ServerOptions
@@ -132,6 +136,22 @@ namespace cartservice
                                     port = int.Parse(portStr);
                                 }
                             }
+							
+							// Initialize Zipkin
+							string zipkinAddr = Environment.GetEnvironmentVariable(ZIPKIN_SERVICE_ADDRESS);
+							if (string.IsNullOrEmpty(zipkinAddr))
+							{
+								Console.WriteLine($"{ZIPKIN_SERVICE_ADDRESS} environment variable was not set. The service will not work!");
+							}
+							else    
+							{
+								TraceManager.SamplingRate = 1.0f;
+								var logger = new ConsoleLogger();
+								var httpSender = new HttpZipkinSender("http://" + zipkinAddr, "application/json");
+								var tracer = new ZipkinTracer(httpSender, new JSONSpanSerializer());
+								TraceManager.RegisterTracer(tracer);
+								TraceManager.Start(logger);
+							}
 
                             // Set redis cache host (hostname+port)
                             ICartStore cartStore;

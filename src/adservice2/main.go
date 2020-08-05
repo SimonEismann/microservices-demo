@@ -44,7 +44,7 @@ import (
 var (
 	version        = "no version set"
 	displayVersion = flag.Bool("version", false, "Show version and quit")
-	logLevel       = flag.String("logLevel", "warn", "log level from debug, info, warning, error. When debug, genetate 100% Tracing")
+	logLevel       = flag.String("logLevel", "debug", "log level from debug, info, warning, error. When debug, genetate 100% Tracing")
 	srvURL         = flag.String("srvURL", ":9555", "IP and port to bind, localhost:9555 or :9555")
 	adFile         = flag.String("adFile", "ads.json", "path to the Ads json file")
 
