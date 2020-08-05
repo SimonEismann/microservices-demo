@@ -65,7 +65,7 @@ namespace cartservice
 			trace.Record(Annotations.Tag("grpc.path", "cartservice/GetCart"));
 			var cart = await cartStore.GetCartAsync(request.UserId);
 			trace.Record(Annotations.ServerSend());
-            return cart;  //Task.FromResult(cart);
+            return Task.FromResult(cart);  // return cart;
         }
     }
 }
