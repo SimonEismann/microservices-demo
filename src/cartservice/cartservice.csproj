@@ -19,7 +19,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="dependencies/zipkin4net.csproj" />
+    <ProjectReference Include="dependencies\zipkin4net.csproj" />
   </ItemGroup>
 
   <ItemGroup>
