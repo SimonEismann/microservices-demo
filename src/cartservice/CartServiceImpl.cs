@@ -57,7 +57,7 @@ namespace cartservice
             return Empty;
         }
 
-        public override Task<Hipstershop.Cart> GetCart(GetCartRequest request, ServerCallContext context)
+        public async override Task<Hipstershop.Cart> GetCart(GetCartRequest request, ServerCallContext context)
         {
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
@@ -65,7 +65,7 @@ namespace cartservice
 			trace.Record(Annotations.Tag("grpc.path", "cartservice/GetCart"));
 			var cart = await cartStore.GetCartAsync(request.UserId);
 			trace.Record(Annotations.ServerSend());
-            return cart;
+            return cart;  //Task.FromResult(cart);
         }
     }
 }
