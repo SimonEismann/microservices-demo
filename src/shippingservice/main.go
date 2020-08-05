@@ -192,7 +192,7 @@ func initZipkinTracing() {
 		return
 	}
 
-	endpoint, err := openzipkin.NewEndpoint("emailservice", "")
+	endpoint, err := openzipkin.NewEndpoint("shippingservice", "")
 	if err != nil {
 		log.Fatalf("unable to create local endpoint: %+v\n", err)
 	}
