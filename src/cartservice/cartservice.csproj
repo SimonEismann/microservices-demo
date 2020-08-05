@@ -16,12 +16,9 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
 	<PackageReference Include="System.Net.Http" Version="4.3.3" />
+	<PackageReference Include="zipkin4net" Version="1.5.0" />
   </ItemGroup>
   
-  <ItemGroup>
-    <ProjectReference Include="dependencies\zipkin4net.csproj" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Update="Dockerfile">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
