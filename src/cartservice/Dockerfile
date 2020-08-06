@@ -23,7 +23,7 @@ RUN apk add --no-cache \
     libstdc++ \
     libintl \
     icu \
-	libssl
+    libssl
 WORKDIR /app
 COPY --from=builder /cartservice .
 ENTRYPOINT ["./cartservice", "start"]
