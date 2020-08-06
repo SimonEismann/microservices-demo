@@ -37,10 +37,12 @@ namespace cartservice
 
         public async override Task<Empty> AddItem(AddItemRequest request, Grpc.Core.ServerCallContext context)
         {
+			Console.WriteLine(context.RequestHeaders);	// DEBUG
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
 			trace.Record(Annotations.ServiceName("cartservice"));
-			trace.Record(Annotations.Tag("grpc.path", "cartservice/AddItem"));
+			trace.Record(Annotations.Rpc("hipstershop.cartservice.additem"));
+			//trace.Record(Annotations.Tag("grpc.path", "cartservice/AddItem"));
             await cartStore.AddItemAsync(request.UserId, request.Item.ProductId, request.Item.Quantity);
 			trace.Record(Annotations.ServerSend());
             return Empty;
@@ -48,10 +50,12 @@ namespace cartservice
 
         public async override Task<Empty> EmptyCart(EmptyCartRequest request, ServerCallContext context)
         {
+			Console.WriteLine(context.RequestHeaders);	// DEBUG
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
 			trace.Record(Annotations.ServiceName("cartservice"));
-			trace.Record(Annotations.Tag("grpc.path", "cartservice/EmptyCart"));
+			trace.Record(Annotations.Rpc("hipstershop.cartservice.emptycart"));
+			//trace.Record(Annotations.Tag("grpc.path", "cartservice/EmptyCart"));
             await cartStore.EmptyCartAsync(request.UserId);
 			trace.Record(Annotations.ServerSend());
             return Empty;
@@ -59,10 +63,12 @@ namespace cartservice
 
         public async override Task<Hipstershop.Cart> GetCart(GetCartRequest request, ServerCallContext context)
         {
+			Console.WriteLine(context.RequestHeaders);	// DEBUG
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
 			trace.Record(Annotations.ServiceName("cartservice"));
-			trace.Record(Annotations.Tag("grpc.path", "cartservice/GetCart"));
+			trace.Record(Annotations.Rpc("hipstershop.cartservice.getcart"));
+			//trace.Record(Annotations.Tag("grpc.path", "cartservice/GetCart"));
 			var cart = await cartStore.GetCartAsync(request.UserId);
 			trace.Record(Annotations.ServerSend());
             return cart;
