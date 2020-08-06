@@ -38,7 +38,9 @@ namespace cartservice
 
         public async override Task<Empty> AddItem(AddItemRequest request, Grpc.Core.ServerCallContext context)
         {
-			Console.WriteLine(context.RequestHeaders.ToString());	// DEBUG
+			foreach(Metadata.Entry entry in context.RequestHeaders){
+				Console.WriteLine("METADATA: " + entry.Key + ", " + entry.Value);	// DEBUG
+			}
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
 			trace.Record(Annotations.ServiceName("cartservice"));
@@ -51,7 +53,9 @@ namespace cartservice
 
         public async override Task<Empty> EmptyCart(EmptyCartRequest request, ServerCallContext context)
         {
-			Console.WriteLine(context.RequestHeaders.ToString());	// DEBUG
+			foreach(Metadata.Entry entry in context.RequestHeaders){
+				Console.WriteLine("METADATA: " + entry.Key + ", " + entry.Value);	// DEBUG
+			}
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
 			trace.Record(Annotations.ServiceName("cartservice"));
@@ -64,7 +68,9 @@ namespace cartservice
 
         public async override Task<Hipstershop.Cart> GetCart(GetCartRequest request, ServerCallContext context)
         {
-			Console.WriteLine(context.RequestHeaders.ToString());	// DEBUG
+			foreach(Metadata.Entry entry in context.RequestHeaders){
+				Console.WriteLine("METADATA: " + entry.Key + ", " + entry.Value);	// DEBUG
+			}
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
 			trace.Record(Annotations.ServiceName("cartservice"));
