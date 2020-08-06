@@ -145,12 +145,13 @@ namespace cartservice
 							}
 							else    
 							{
-								TraceManager.SamplingRate = 1.0f;
+								TraceManager.SamplingRate = 1.0f;	// activate full tracing
 								var logger = new ConsoleLogger();
 								var httpSender = new HttpZipkinSender("http://" + zipkinAddr, "application/json");
 								var tracer = new ZipkinTracer(httpSender, new JSONSpanSerializer());
 								TraceManager.RegisterTracer(tracer);
 								TraceManager.Start(logger);
+								Console.WriteLine("Zipkin Tracer started. Collector Address: " + zipkinAddr);
 							}
 
                             // Set redis cache host (hostname+port)

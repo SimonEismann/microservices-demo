@@ -11,18 +11,18 @@ namespace cartservice
     {
         public void LogError(string message)
         {
-            Console.Error.WriteLine(message);
+            Console.Error.WriteLine("ZIPKIN ERROR: " + message);
         }
 
         public void LogInformation(string message)
         {
-            Console.WriteLine(message);
+            Console.WriteLine("ZIPKIN LOG: " + message);
         }
 
         public void LogWarning(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(message);
+            Console.WriteLine("ZIPKIN WARNING: " + message);
             Console.ResetColor();
         }
     }
