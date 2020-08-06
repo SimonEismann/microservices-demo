@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,9 +37,6 @@ namespace cartservice
 
         public async override Task<Empty> AddItem(AddItemRequest request, Grpc.Core.ServerCallContext context)
         {
-			foreach(Metadata.Entry entry in context.RequestHeaders){
-				Console.WriteLine("METADATA: " + entry.Key + ", " + entry.Value);	// DEBUG
-			}
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
 			trace.Record(Annotations.ServiceName("cartservice"));
@@ -53,9 +49,6 @@ namespace cartservice
 
         public async override Task<Empty> EmptyCart(EmptyCartRequest request, ServerCallContext context)
         {
-			foreach(Metadata.Entry entry in context.RequestHeaders){
-				Console.WriteLine("METADATA: " + entry.Key + ", " + entry.Value);	// DEBUG
-			}
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
 			trace.Record(Annotations.ServiceName("cartservice"));
@@ -68,9 +61,6 @@ namespace cartservice
 
         public async override Task<Hipstershop.Cart> GetCart(GetCartRequest request, ServerCallContext context)
         {
-			foreach(Metadata.Entry entry in context.RequestHeaders){
-				Console.WriteLine("METADATA: " + entry.Key + ", " + entry.Value);	// DEBUG
-			}
 			var trace = Trace.Create();
 			trace.Record(Annotations.ServerRecv());
 			trace.Record(Annotations.ServiceName("cartservice"));
