@@ -82,7 +82,7 @@ func (fe *frontendServer) homeHandler(w http.ResponseWriter, r *http.Request) {
 		"products":      ps,
 		"cart_size":     len(cart),
 		"banner_color":  os.Getenv("BANNER_COLOR"), // illustrates canary deployments
-		"ad":            fe.chooseAdRest(r.Context(), []string{}, log),
+		"ad":            fe.chooseAd(r.Context(), []string{}, log),
 	}); err != nil {
 		log.Error(err)
 	}
@@ -135,7 +135,7 @@ func (fe *frontendServer) productHandler(w http.ResponseWriter, r *http.Request)
 	if err := templates.ExecuteTemplate(w, "product", map[string]interface{}{
 		"session_id":      sessionID(r),
 		"request_id":      r.Context().Value(ctxKeyRequestID{}),
-		"ad":              fe.chooseAdRest(r.Context(), p.Categories, log),
+		"ad":              fe.chooseAd(r.Context(), p.Categories, log),
 		"user_currency":   currentCurrency(r),
 		"currencies":      currencies,
 		"product":         product,

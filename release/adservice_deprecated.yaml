@@ -19,6 +19,8 @@ spec:
       version: v1
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
       labels:
         app: adservice
         name: adservice
@@ -27,37 +29,41 @@ spec:
     spec:
       containers:
       - env:
-        - name: HEALTH_PORT
-          value: "9557"
-        - name: PORT
-          value: "9555"
+        - name: BINDDELAY
+          value: 0s
+        - name: CONSECUTIVEERROR
+          value: "0"
+        - name: EXTRA_LATENCY
+          value: 0s
+        - name: LOGLEVEL
+          value: debug
+        - name: SRVURL
+          value: :9555
+        - name: STARTDELAY
+          value: 0s
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/adservice3:master
+        image: simoneismann/adservice2:master
         imagePullPolicy: Always
         livenessProbe:
-          exec:
-            command:
-            - /bin/grpc_health_probe
-            - -addr=:9557
+          httpGet:
+            path: /healthz
+            port: 9555
         name: adservice
         ports:
         - containerPort: 9555
-          name: grpc
-        - containerPort: 9557
-          name: health
+          name: http
         readinessProbe:
-          exec:
-            command:
-            - /bin/grpc_health_probe
-            - -addr=:9557
+          httpGet:
+            path: /healthz
+            port: 9555
         resources:
           limits:
-            cpu: 200m
-            memory: 128Mi
+            cpu: 300m
+            memory: 300Mi
           requests:
-            cpu: 100m
-            memory: 64Mi
+            cpu: 200m
+            memory: 180Mi
       serviceAccountName: adservice
 ---
 apiVersion: v1
@@ -72,12 +78,9 @@ metadata:
   namespace: default
 spec:
   ports:
-  - name: grpc-adservice
+  - name: http
     port: 9555
     targetPort: 9555
-  - name: health-adservice
-    port: 9557
-    targetPort: 9557
   selector:
     app: adservice
     project: hipstershopistio
