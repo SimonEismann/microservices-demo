@@ -38,7 +38,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice/genproto"
+	pb "github.com/SimonEismann/microservices-demo/src/cartservice2/genproto"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
@@ -140,11 +140,11 @@ func (cs *cartService) AddItem(c context.Context, request *pb.AddItemRequest) (*
 	if !foundExisting {
 		cart.Items = append(cart.Items, request.Item)
 	}
-	err2 := rdb.Set(c, request.UserId, cartItemsToString(&cart.Items), 0).Err()
+	err2 := rdb.Set(c, request.UserId, *cartItemsToString(&cart.Items), 0).Err()
 	if err2 != nil {
 		log.Fatal(err2)
 	}
-	return &pb.Empty{}, nil		//DEBUG
+	return &pb.Empty{}, nil
 }
 
 func (cs *cartService) GetCart(c context.Context, request *pb.GetCartRequest) (*pb.Cart, error) {
@@ -165,7 +165,7 @@ func (cs *cartService) GetCart(c context.Context, request *pb.GetCartRequest) (*
 
 func (cs *cartService) EmptyCart(c context.Context, request *pb.EmptyCartRequest) (*pb.Empty, error) {
 	rdb := cs.ConnectToRedis(c)
-	err := rdb.Set(c, request.UserId, cartItemsToString(nil), 0).Err()
+	err := rdb.Set(c, request.UserId, *cartItemsToString(nil), 0).Err()
 	if err != nil {
 		log.Fatal(err)
 	}
