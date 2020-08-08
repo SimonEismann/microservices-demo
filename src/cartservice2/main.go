@@ -83,15 +83,17 @@ func cartItemsFromString(data *string) *[]*pb.CartItem {
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
 		temp := strings.Split(line, ";")
-		quantity, err := strconv.ParseInt(temp[1], 10, 32)
-		if err != nil {
-			log.Error("Could not convert quantity string " + temp[1] + " to int32!")
-		}else{
-			item := &pb.CartItem{
-				ProductId:            temp[0],
-				Quantity:             int32(quantity),
+		if len(temp) == 2 {
+			quantity, err := strconv.ParseInt(temp[1], 10, 32)
+			if err != nil {
+				log.Error("Could not convert quantity string " + temp[1] + " to int32!")
+			} else {
+				item := &pb.CartItem{
+					ProductId: temp[0],
+					Quantity:  int32(quantity),
+				}
+				items = append(items, item)
 			}
-			items = append(items, item)
 		}
 	}
 	return &items
@@ -135,6 +137,7 @@ func (cs *cartService) AddItem(c context.Context, request *pb.AddItemRequest) (*
 		if item.ProductId == request.Item.ProductId {
 			foundExisting = true
 			item.Quantity += request.Item.Quantity
+			break
 		}
 	}
 	if !foundExisting {
