@@ -73,13 +73,11 @@ func cartItemsToString(items *[]*pb.CartItem) *string {
 			res += item.ProductId + ";" + strconv.FormatInt(int64(item.Quantity), 10) + "\n"
 		}
 	}
-	log.Info("items to string: " + res)				//TODO DEBUG
 	return &res
 }
 
 // parses cart item csv to CartItem array/slice
 func cartItemsFromString(data *string) *[]*pb.CartItem {
-	log.Info("string to items: " + *data)		//TODO DEBUG
 	lines := strings.Split(*data, "\n")
 	items := []*pb.CartItem{}
 	for i := 0; i < len(lines); i++ {
@@ -157,7 +155,7 @@ func (cs *cartService) GetCart(c context.Context, request *pb.GetCartRequest) (*
 	val, err := rdb.Get(c, request.UserId).Result()		// redis maps keys (userId) to value (cart items as string)
 	cart := pb.Cart{UserId: request.UserId}
 	if err == redis.Nil {
-		log.Info("cart for " + request.UserId + "does not exist")
+		log.Info("cart for " + request.UserId + " does not exist")
 		cart.Items = []*pb.CartItem{}
 	} else if err != nil {
 		log.Fatal(err)
