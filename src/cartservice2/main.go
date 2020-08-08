@@ -70,14 +70,16 @@ func cartItemsToString(items *[]*pb.CartItem) *string {
 	if items != nil {
 		for i := 0; i < len(*items); i++ {
 			item := (*items)[i]
-			res += item.ProductId + ";" + string(item.Quantity) + "\n"
+			res += item.ProductId + ";" + strconv.FormatInt(int64(item.Quantity), 10) + "\n"
 		}
 	}
+	log.Info("items to string: " + res)				//TODO DEBUG
 	return &res
 }
 
 // parses cart item csv to CartItem array/slice
 func cartItemsFromString(data *string) *[]*pb.CartItem {
+	log.Info("string to items: " + *data)		//TODO DEBUG
 	lines := strings.Split(*data, "\n")
 	items := []*pb.CartItem{}
 	for i := 0; i < len(lines); i++ {
@@ -166,9 +168,10 @@ func (cs *cartService) GetCart(c context.Context, request *pb.GetCartRequest) (*
 	return &cart, nil
 }
 
+// Deletes cart from redis for specific userId
 func (cs *cartService) EmptyCart(c context.Context, request *pb.EmptyCartRequest) (*pb.Empty, error) {
 	rdb := cs.ConnectToRedis(c)
-	err := rdb.Set(c, request.UserId, *cartItemsToString(nil), 0).Err()
+	err := rdb.Del(c, request.UserId).Err()
 	if err != nil {
 		log.Fatal(err)
 	}
