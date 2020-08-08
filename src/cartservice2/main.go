@@ -20,6 +20,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
@@ -62,18 +64,51 @@ func init() {
 	log.Out = os.Stdout
 }
 
+// convert cart content to csv
+func cartItemsToString(items *[]*pb.CartItem) *string {
+	res := ""
+	if items != nil {
+		for i := 0; i < len(*items); i++ {
+			item := (*items)[i]
+			res += item.ProductId + ";" + string(item.Quantity) + "\n"
+		}
+	}
+	return &res
+}
+
+// parses cart item csv to CartItem array/slice
+func cartItemsFromString(data *string) *[]*pb.CartItem {
+	lines := strings.Split(*data, "\n")
+	items := []*pb.CartItem{}
+	for i := 0; i < len(lines); i++ {
+		line := lines[i]
+		temp := strings.Split(line, ";")
+		quantity, err := strconv.ParseInt(temp[1], 10, 32)
+		if err != nil {
+			log.Error("Could not convert quantity string " + temp[1] + " to int32!")
+		}else{
+			item := &pb.CartItem{
+				ProductId:            temp[0],
+				Quantity:             int32(quantity),
+			}
+			items = append(items, item)
+		}
+	}
+	return &items
+}
+
 type cartService struct {
 	redisSvcAddr string
 }
 
-func (cs *cartService) ConnectToRedis() *redis.Client {
+func (cs *cartService) ConnectToRedis(c context.Context) *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     cs.redisSvcAddr,
 		Password: "", // no password set
 		DB:       0,  // use default DB
-		MaxRetries: 5,
+		MaxRetries: 5, // like in the c# implementation
 	})
-	pong, err := rdb.Ping(context.Background()).Result()
+	pong, err := rdb.Ping(c).Result()
 	if err != nil {
 		log.Fatal(err)
 	} else {
@@ -83,36 +118,58 @@ func (cs *cartService) ConnectToRedis() *redis.Client {
 }
 
 func (cs *cartService) AddItem(c context.Context, request *pb.AddItemRequest) (*pb.Empty, error) {
-	rdb := cs.ConnectToRedis()
-	val, err := rdb.Get(c, "cart").Result()
-	if err != nil {
+	rdb := cs.ConnectToRedis(c)
+	val, err := rdb.Get(c, request.UserId).Result()		// redis maps keys (userId) to value (cart items as string)
+	cart := pb.Cart{UserId: request.UserId}
+	if err == redis.Nil {
+		log.Info("cart for " + request.UserId + "does not exist")
+		cart.Items = []*pb.CartItem{}
+	} else if err != nil {
 		log.Fatal(err)
 	} else {
-		log.Info(val)
+		log.Info("Cart retrieved: " + val)
+		cart.Items = *cartItemsFromString(&val)
+	}
+	foundExisting := false
+	for _, item := range cart.Items {
+		if item.ProductId == request.Item.ProductId {
+			foundExisting = true
+			item.Quantity += request.Item.Quantity
+		}
+	}
+	if !foundExisting {
+		cart.Items = append(cart.Items, request.Item)
+	}
+	err2 := rdb.Set(c, request.UserId, cartItemsToString(&cart.Items), 0).Err()
+	if err2 != nil {
+		log.Fatal(err2)
 	}
 	return &pb.Empty{}, nil		//DEBUG
 }
 
 func (cs *cartService) GetCart(c context.Context, request *pb.GetCartRequest) (*pb.Cart, error) {
-	rdb := cs.ConnectToRedis()
-	val, err := rdb.Get(c, "cart").Result()
-	if err != nil {
+	rdb := cs.ConnectToRedis(c)
+	val, err := rdb.Get(c, request.UserId).Result()		// redis maps keys (userId) to value (cart items as string)
+	cart := pb.Cart{UserId: request.UserId}
+	if err == redis.Nil {
+		log.Info("cart for " + request.UserId + "does not exist")
+		cart.Items = []*pb.CartItem{}
+	} else if err != nil {
 		log.Fatal(err)
 	} else {
-		log.Info(val)
+		log.Info("Cart retrieved: " + val)
+		cart.Items = *cartItemsFromString(&val)
 	}
-	return &pb.Cart{}, nil		//DEBUG
+	return &cart, nil
 }
 
 func (cs *cartService) EmptyCart(c context.Context, request *pb.EmptyCartRequest) (*pb.Empty, error) {
-	rdb := cs.ConnectToRedis()
-	val, err := rdb.Get(c, "cart").Result()
+	rdb := cs.ConnectToRedis(c)
+	err := rdb.Set(c, request.UserId, cartItemsToString(nil), 0).Err()
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		log.Info(val)
 	}
-	return &pb.Empty{}, nil		//DEBUG
+	return &pb.Empty{}, nil
 }
 
 func main() {

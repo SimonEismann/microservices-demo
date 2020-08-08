@@ -9,7 +9,6 @@ require (
 	github.com/GoogleCloudPlatform/microservices-demo v0.2.0
 	github.com/go-redis/redis/v8 v8.0.0-beta.7
 	github.com/golang/protobuf v1.4.2
-	github.com/google/uuid v1.1.1
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/sirupsen/logrus v1.4.2
 	go.opencensus.io v0.22.2
