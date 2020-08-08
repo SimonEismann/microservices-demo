@@ -27,36 +27,40 @@ spec:
     spec:
       containers:
       - env:
+        - name: LISTEN_ADDR
+          value: 0.0.0.0
         - name: PORT
           value: "7070"
         - name: REDIS_ADDR
           value: redis-cart:6379
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/cartservice2:master
+        image: simoneismann/cartservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7072
+            - -addr=:7070
+            - -rpc-timeout=5s
+          initialDelaySeconds: 15
         name: cartservice
         ports:
         - containerPort: 7070
           name: grpc
-        - containerPort: 7072
-          name: health
         readinessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7072
+            - -addr=:7070
+            - -rpc-timeout=5s
+          initialDelaySeconds: 15
         resources:
           limits:
-            cpu: 200m
+            cpu: 300m
             memory: 128Mi
           requests:
-            cpu: 100m
+            cpu: 200m
             memory: 64Mi
       serviceAccountName: cartservice
 ---
@@ -75,9 +79,6 @@ spec:
   - name: grpc-cartservice
     port: 7070
     targetPort: 7070
-  - name: health-cartservice
-    port: 7072
-    targetPort: 7072
   selector:
     app: cartservice
     project: hipstershopistio
