@@ -192,13 +192,13 @@ function setupTracerAndExporters () {
     exporter = new ConsoleExporter(defaultBufferConfig);
   }
 
-  // Starts Stackdriver exporter
-  tracing.registerExporter(exporter).start();
-
   // Starts tracing and set sampling rate
   const tracer = tracing.start({
     samplingRate: 1 // For demo purposes, always sample
   }).tracer;
+  
+  // Starts Stackdriver exporter
+  tracing.registerExporter(exporter).start();
 
   // Defines basedir and version
   const basedir = path.dirname(require.resolve('grpc'));

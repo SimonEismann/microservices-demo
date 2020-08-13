@@ -1,0 +1,997 @@
+{
+  "formatVersion": 3,
+  "id": "root",
+  "ideas": {
+    "1": {
+      "title": "Frontend (Go) :8080",
+      "id": 1,
+      "attr": {
+        "position": [
+          141,
+          -385,
+          1
+        ],
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        }
+      },
+      "ideas": {
+        "1": {
+          "title": "\"/logout\" [POST]",
+          "id": 3,
+          "attr": {
+            "style": {
+              "backgroundColor": "#99CC00"
+            },
+            "position": [
+              207,
+              -200,
+              14
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        },
+        "2": {
+          "title": "\"/product/{id}\" [GET]",
+          "id": 5,
+          "ideas": {},
+          "attr": {
+            "position": [
+              195,
+              -54,
+              6
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            },
+            "style": {
+              "backgroundColor": "#FF00FF"
+            }
+          }
+        },
+        "3": {
+          "title": "\"/cart\" [GET] (showCart)",
+          "id": 7,
+          "attr": {
+            "position": [
+              174,
+              113,
+              9
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            },
+            "style": {
+              "backgroundColor": "#993366",
+              "text": {
+                "color": "#FFFFFF"
+              }
+            }
+          }
+        },
+        "13": {
+          "title": "\"/cart\" [POST] (addItemToCart)",
+          "id": 6,
+          "attr": {
+            "position": [
+              174,
+              208,
+              11
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        },
+        "23": {
+          "title": "\"/cart/checkout\" [POST]",
+          "id": 10,
+          "attr": {
+            "position": [
+              178,
+              300,
+              12
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        },
+        "1.5": {
+          "title": "\"/cart/empty\" [POST]",
+          "id": 8,
+          "attr": {
+            "style": {
+              "backgroundColor": "#99CC00"
+            },
+            "position": [
+              193,
+              -140,
+              13
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        },
+        "0.5": {
+          "title": "\"/setCurrency\" [POST]",
+          "id": 9,
+          "attr": {
+            "position": [
+              175,
+              -267,
+              8
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        },
+        "2.5": {
+          "title": "\"/\" [GET] (home)",
+          "id": 4,
+          "attr": {
+            "position": [
+              205,
+              26,
+              10
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            },
+            "style": {
+              "backgroundColor": "#33CCCC"
+            }
+          }
+        }
+      }
+    },
+    "2": {
+      "title": "Adservice (Go) :9555",
+      "id": 11,
+      "attr": {
+        "position": [
+          -103,
+          -711,
+          1
+        ],
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        }
+      },
+      "ideas": {
+        "10": {
+          "title": "GetAds [grpc]",
+          "id": 12,
+          "attr": {
+            "position": [
+              159,
+              126,
+              1
+            ],
+            "parentConnector": {
+              "color": "#008000",
+              "width": 3
+            }
+          }
+        }
+      }
+    },
+    "3": {
+      "title": "Emailservice (Python) :8080",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        },
+        "position": [
+          -1087.9999923706055,
+          -175.79996948242183,
+          1
+        ]
+      },
+      "ideas": {
+        "1": {
+          "title": "sendOrderConfirmation [grpc]",
+          "id": 23,
+          "attr": {
+            "parentConnector": {
+              "color": "#008000",
+              "width": 3
+            }
+          }
+        }
+      },
+      "id": 22
+    },
+    "4": {
+      "title": "Paymentservice (Node.js) :50051",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        },
+        "position": [
+          -1083,
+          -489,
+          1
+        ]
+      },
+      "ideas": {
+        "10": {
+          "title": "Charge [grpc]",
+          "id": 25,
+          "attr": {
+            "position": [
+              207,
+              21,
+              1
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        }
+      },
+      "id": 24
+    },
+    "5": {
+      "title": "Productcatalogservice (Go) :3550",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        },
+        "position": [
+          -499,
+          -108,
+          1
+        ]
+      },
+      "ideas": {
+        "1": {
+          "title": "ListProducts [grpc]",
+          "id": 27,
+          "attr": {
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        },
+        "2": {
+          "title": "SearchProducts [grpc]",
+          "id": 29,
+          "attr": {
+            "style": {
+              "backgroundColor": "#99CC00"
+            },
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          },
+          "ideas": {}
+        },
+        "-1": {
+          "title": "GetProduct [grpc]",
+          "id": 28,
+          "attr": {
+            "position": [
+              263.99998474121094,
+              -132.30001525878902,
+              1
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        }
+      },
+      "id": 26
+    },
+    "6": {
+      "title": "Recommendationservice (Python) :8080",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        },
+        "position": [
+          1000,
+          -169,
+          1
+        ]
+      },
+      "ideas": {
+        "-10": {
+          "title": "ListRecommendations [grpc]",
+          "id": 31,
+          "ideas": {},
+          "attr": {
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        }
+      },
+      "id": 30
+    },
+    "7": {
+      "title": "Shippingservice (Go) :50051",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        },
+        "position": [
+          -716,
+          74,
+          1
+        ]
+      },
+      "ideas": {
+        "1": {
+          "title": "GetQuote [grpc]",
+          "id": 33,
+          "attr": {
+            "position": [
+              253,
+              24,
+              1
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        },
+        "-1": {
+          "title": "ShipOrder [grpc]",
+          "id": 34,
+          "attr": {
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        }
+      },
+      "id": 32
+    },
+    "8": {
+      "title": "Cartservice (Go) :7070",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        },
+        "position": [
+          801,
+          -367,
+          1
+        ]
+      },
+      "ideas": {
+        "10": {
+          "title": "Redis :6379",
+          "attr": {
+            "style": {
+              "backgroundColor": "#C0C0C0",
+              "text": {
+                "color": "#000000"
+              },
+              "fontMultiplier": 1.75
+            },
+            "parentConnector": {
+              "width": 4,
+              "arrow": "both",
+              "color": "#000080",
+              "label": "Exchanges Data [TCP]"
+            },
+            "position": [
+              351.5,
+              20.179141235351608,
+              7
+            ]
+          },
+          "ideas": {},
+          "id": 41
+        },
+        "-1": {
+          "title": "EmptyCart [grpc]",
+          "id": 37,
+          "attr": {
+            "position": [
+              295,
+              -159,
+              2
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        },
+        "-11": {
+          "title": "AddItem [grpc]",
+          "id": 38,
+          "attr": {
+            "position": [
+              305,
+              199,
+              5
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        },
+        "-6": {
+          "title": "GetCart [grpc]",
+          "id": 36,
+          "attr": {
+            "position": [
+              181,
+              26,
+              6
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        }
+      },
+      "id": 35
+    },
+    "9": {
+      "title": "Currencyservice (Node.js) :7000",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        },
+        "parentConnector": {
+          "width": 3,
+          "arrow": "both",
+          "color": "#000000"
+        },
+        "position": [
+          -581,
+          -624,
+          1
+        ]
+      },
+      "ideas": {
+        "1": {
+          "title": "GetSupportedCurrencies [grpc]",
+          "id": 45,
+          "attr": {
+            "position": [
+              211,
+              37,
+              2
+            ],
+            "parentConnector": {
+              "color": "#008000",
+              "width": 3
+            }
+          }
+        },
+        "11": {
+          "title": "Convert [grpc]",
+          "id": 46,
+          "attr": {
+            "position": [
+              200,
+              150,
+              3
+            ],
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            }
+          }
+        }
+      },
+      "id": 44
+    },
+    "10": {
+      "title": "Checkoutservice (Go) :5050",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        },
+        "parentConnector": {
+          "width": 3,
+          "arrow": "both",
+          "color": "#000000"
+        },
+        "position": [
+          -1091,
+          -361,
+          1
+        ]
+      },
+      "ideas": {
+        "1": {
+          "title": "PlaceOrder [grpc]",
+          "id": 49,
+          "attr": {
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000"
+            },
+            "style": {
+              "backgroundColor": "#FF9900"
+            }
+          }
+        }
+      },
+      "id": 47
+    },
+    "11": {
+      "title": "Loadgenerator",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75
+        },
+        "parentConnector": {
+          "width": 3,
+          "arrow": "both",
+          "color": "#000000"
+        },
+        "position": [
+          -226,
+          -372,
+          1
+        ]
+      },
+      "ideas": {},
+      "id": 48
+    },
+    "12": {
+      "title": "[Service Name] ([Programming Language]) :[Container Port]",
+      "attr": {
+        "style": {
+          "backgroundColor": "#C0C0C0",
+          "text": {
+            "color": "#000000"
+          },
+          "fontMultiplier": 1.75,
+          "width": 285
+        },
+        "position": [
+          20.999984741210938,
+          100.51248474121098,
+          1
+        ]
+      },
+      "ideas": {
+        "1": {
+          "title": "[Function] [[Protocol]]",
+          "attr": {
+            "parentConnector": {
+              "width": 3,
+              "color": "#008000",
+              "label": "[Service provides function]"
+            },
+            "position": [
+              499.00001525878906,
+              36.208343505859375,
+              1
+            ]
+          },
+          "id": 54
+        }
+      },
+      "id": 53
+    },
+    "13": {
+      "title": "[Function is not used by our setup]",
+      "attr": {
+        "style": {
+          "backgroundColor": "#99CC00"
+        },
+        "parentConnector": {
+          "width": 3,
+          "color": "#008000"
+        },
+        "position": [
+          737.5,
+          129.70003051757817,
+          1
+        ]
+      },
+      "id": 56
+    }
+  },
+  "title": "Frontend (Go) :8080",
+  "links": [
+    {
+      "ideaIdFrom": 48,
+      "ideaIdTo": 1,
+      "attr": {
+        "style": {
+          "color": "#000080",
+          "lineStyle": "solid",
+          "arrow": "to",
+          "width": 3,
+          "label": "Send Requests [HTTP]"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 49,
+      "ideaIdTo": 36,
+      "attr": {
+        "style": {
+          "color": "#FF9900",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 49,
+      "ideaIdTo": 28,
+      "attr": {
+        "style": {
+          "color": "#FF9900",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 49,
+      "ideaIdTo": 46,
+      "attr": {
+        "style": {
+          "color": "#FF9900",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 49,
+      "ideaIdTo": 25,
+      "attr": {
+        "style": {
+          "color": "#FF9900",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 49,
+      "ideaIdTo": 34,
+      "attr": {
+        "style": {
+          "color": "#FF9900",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 49,
+      "ideaIdTo": 33,
+      "attr": {
+        "style": {
+          "color": "#FF9900",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 6,
+      "ideaIdTo": 28,
+      "attr": {
+        "style": {
+          "color": "#707070",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 6,
+      "ideaIdTo": 38,
+      "attr": {
+        "style": {
+          "color": "#707070",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 4,
+      "ideaIdTo": 45,
+      "attr": {
+        "style": {
+          "color": "#33CCCC",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 4,
+      "ideaIdTo": 27,
+      "attr": {
+        "style": {
+          "color": "#33CCCC",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 4,
+      "ideaIdTo": 36,
+      "attr": {
+        "style": {
+          "color": "#33CCCC",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 4,
+      "ideaIdTo": 46,
+      "attr": {
+        "style": {
+          "color": "#33CCCC",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 4,
+      "ideaIdTo": 12,
+      "attr": {
+        "style": {
+          "color": "#33CCCC",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 10,
+      "ideaIdTo": 49,
+      "attr": {
+        "style": {
+          "color": "#707070",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 10,
+      "ideaIdTo": 31,
+      "attr": {
+        "style": {
+          "color": "#707070",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 5,
+      "ideaIdTo": 28,
+      "attr": {
+        "style": {
+          "color": "#FF00FF",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 5,
+      "ideaIdTo": 45,
+      "attr": {
+        "style": {
+          "color": "#FF00FF",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 5,
+      "ideaIdTo": 36,
+      "attr": {
+        "style": {
+          "color": "#FF00FF",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 5,
+      "ideaIdTo": 46,
+      "attr": {
+        "style": {
+          "color": "#FF00FF",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 5,
+      "ideaIdTo": 31,
+      "attr": {
+        "style": {
+          "color": "#FF00FF",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 5,
+      "ideaIdTo": 12,
+      "attr": {
+        "style": {
+          "color": "#FF00FF",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 7,
+      "ideaIdTo": 45,
+      "attr": {
+        "style": {
+          "color": "#993366",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 7,
+      "ideaIdTo": 36,
+      "attr": {
+        "style": {
+          "color": "#993366",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 7,
+      "ideaIdTo": 31,
+      "attr": {
+        "style": {
+          "color": "#993366",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 7,
+      "ideaIdTo": 28,
+      "attr": {
+        "style": {
+          "color": "#993366",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 7,
+      "ideaIdTo": 33,
+      "attr": {
+        "style": {
+          "color": "#993366",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 7,
+      "ideaIdTo": 46,
+      "attr": {
+        "style": {
+          "color": "#993366",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 49,
+      "ideaIdTo": 23,
+      "attr": {
+        "style": {
+          "color": "#FF9900",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    },
+    {
+      "ideaIdFrom": 8,
+      "ideaIdTo": 37,
+      "attr": {
+        "style": {
+          "color": "#707070",
+          "lineStyle": "solid",
+          "arrow": "to"
+        }
+      }
+    }
+  ]
+}

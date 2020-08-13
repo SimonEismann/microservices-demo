@@ -1,8 +1,16 @@
 # Hipster Shop: Cloud-Native Microservices Demo Application
  
-This repo is a fork of http://go/microservices-demo with modifications to suite the Tetrate Service Bridge.
+This repo is a fork of Tetrate's modified version of Google's http://go/microservices-demo with modifications to allow for in-depth Zipkin tracing. Changes include:
+- Native 100% tracing of every service with Zipkin with respect to parent and child spans.
+- Deployment with pre-built Zipkin and MySQL instances to allow for fast data generation and extraction.
+- Rewrite of `adservice` and `cartservice` in Go.
+- Lots of smaller fixes.
+- Ready to use deployment (with Istio) and data extraction scripts.
 
-## building images
+# Overview
+![Overview Image](/doc/overview_detail.svg)
+
+# Building Images
 Images are built automatically using a Github Action.
 They are published in Docker Hub in the `microservicesdemomesh` registry.
 
@@ -21,14 +29,12 @@ TAG=v0.1.8 REPO_PREFIX=my.docker.hub ./hack/make-docker-images.sh
 
 # Deployment in Google Cloud Shell
 ```shell
-sudo apt-get install mariadb-client
-
-# install files
+# install files (only needed once)
 curl -L https://istio.io/downloadIstio | sh - # download newest istio release
 git clone https://github.com/SimonEismann/microservices-demo se-microservices-demo
 
 # execute
-cd istio-1.6.5 # version may change!
+cd istio-1.6.5 # version may change! check after installation!
 export PATH=$PWD/bin:$PATH
 export PROJECT_ID=`gcloud config get-value project`
 export ZONE=us-central1-a
@@ -47,14 +53,25 @@ kubectl apply -f ./istio-manifests
 kubectl apply -f ./kubernetes-manifests
 istioctl analyze
 INGRESS_HOST="$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
-echo "$INGRESS_HOST"
+echo "$INGRESS_HOST"	# website can be accessed by local browser at this address
+```
 
-# dashboard
+## Kiali Dashboard
+Opens a web dashboard with live traffic observation and further inspection functions.
+```shell
 istioctl dashboard kiali # username=admin, password=admin, kiali graph filter: hide -> name*=whitelist OR name*=Passthrough
+```
 
-# dump all zipkin tables as csv: https://stackoverflow.com/questions/12040816/dump-all-tables-in-csv-format-using-mysqldump
-# mysql -h or --host=localhost for remote host
-for tb in $(mysql --protocol=tcp -pzipkin -uzipkin zipkin -sN -e "SHOW TABLES;"); do
-    mysql -B --protocol=tcp -pzipkin -uzipkin zipkin -e "SELECT * FROM ${tb};" | sed "s/\"/\"\"/g;s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" > ${tb}.csv;
+## MySQL dump to CSV
+Install a MySQL client:
+```shell
+sudo apt-get install mariadb-client
+```
+Then create a shell script, which takes the hostname (or IP) as a parameter:
+```shell
+HOST=$1
+mkdir dump
+for tb in $(mysql --protocol=tcp --host=${HOST} -pzipkin -uzipkin zipkin -sN -e "SHOW TABLES;"); do
+    mysql -B --protocol=tcp --host=${HOST} -pzipkin -uzipkin zipkin -e "SELECT * FROM ${tb};" | sed "s/\"/\"\"/g;s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" > dump/${tb}.csv;
 done
 ```
