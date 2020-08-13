@@ -1,5 +1,4 @@
 # Hipster Shop: Cloud-Native Microservices Demo Application
- 
 This repo is a fork of Tetrate's modified version of Google's http://go/microservices-demo with modifications to allow for in-depth Zipkin tracing. Changes include:
 - Native 100% tracing of every service with Zipkin with respect to parent and child spans.
 - Deployment with pre-built Zipkin and MySQL instances to allow for fast data generation and extraction.
@@ -8,11 +7,14 @@ This repo is a fork of Tetrate's modified version of Google's http://go/microser
 - Ready to use deployment (with Istio) and data extraction scripts.
 
 # Overview
-![Overview Image](/doc/overview_detail.svg)
+The following picture shows the connection graph of the services as defined by Tetrate. We reimplemented `cartservice` in Go. We do not build or deploy `apiservice` in our scripts and setup.
+![Overview Image Coarse](/doc/overview_tetrate.svg)
+Here is our updated and more detailed service architecture, which also shows the functionalities of the services:
+![Overview Image Detailed](/doc/overview_detail.svg)
 
 # Building Images
 Images are built automatically using a Github Action.
-They are published in Docker Hub in the `microservicesdemomesh` registry.
+They are published in Docker Hub in the `simoneismann` registry.
 
 You can build the images using the scripts located in the `hack` folder:
 
@@ -32,7 +34,8 @@ TAG=v0.1.8 REPO_PREFIX=my.docker.hub ./hack/make-docker-images.sh
 # install files (only needed once)
 curl -L https://istio.io/downloadIstio | sh - # download newest istio release
 git clone https://github.com/SimonEismann/microservices-demo se-microservices-demo
-
+```
+```shell
 # execute
 cd istio-1.6.5 # version may change! check after installation!
 export PATH=$PWD/bin:$PATH
