@@ -31,22 +31,24 @@ spec:
           value: "7000"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/currencyservice:master
+        image: simoneismann/currencyservice2:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7000
+            - -addr=:7002
         name: currencyservice
         ports:
         - containerPort: 7000
           name: grpc
+        - containerPort: 7002
+          name: health
         readinessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7000
+            - -addr=:7002
         resources:
           limits:
             cpu: 200m
@@ -71,6 +73,9 @@ spec:
   - name: grpc-currencyservice
     port: 7000
     targetPort: 7000
+  - name: health-currencyservice
+    port: 7002
+    targetPort: 7002
   selector:
     app: currencyservice
     project: hipstershopistio

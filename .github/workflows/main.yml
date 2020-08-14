@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: [adservice3, cartservice2, checkoutservice, currencyservice, emailservice, frontend, loadgenerator, paymentservice, productcatalogservice, recommendationservice, shippingservice]
+        app: [adservice3, cartservice2, checkoutservice, currencyservice2, emailservice, frontend, loadgenerator, paymentservice, productcatalogservice, recommendationservice, shippingservice]
     steps:
     - uses: actions/checkout@v2
     - name: Get the GIT TAG and Build the Docker image
@@ -37,7 +37,7 @@ jobs:
     needs: test
     strategy:
       matrix:
-        app: [adservice3, cartservice2, checkoutservice, currencyservice, emailservice, frontend, loadgenerator, paymentservice, productcatalogservice, recommendationservice, shippingservice]
+        app: [adservice3, cartservice2, checkoutservice, currencyservice2, emailservice, frontend, loadgenerator, paymentservice, productcatalogservice, recommendationservice, shippingservice]
     steps:
     - name: Login on DockerHub
       run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD

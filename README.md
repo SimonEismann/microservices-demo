@@ -2,13 +2,13 @@
 This repo is a fork of Tetrate's modified version of the GCP Hipstershop/Online Boutique with modifications to allow for in-depth Zipkin tracing. Changes include:
 - Native 100% tracing of every service with Zipkin with respect to parent and child spans.
 - Deployment with pre-built Zipkin and MySQL instances to allow for fast data generation and extraction.
-- Rewrite of `adservice` and `cartservice` in Go.
+- Rewrite of `adservice`, `cartservice` and `currencyservice` in Go.
 - Lots of smaller fixes.
 - Ready to use deployment (with Istio) and data extraction scripts.
-- **WIP**: Artificial delays through matrix multiplication
+- **WIP**: Artificial delays with matrix multiplication
 
 # Overview
-The following picture shows the connection graph of the services as defined by Tetrate. We reimplemented `cartservice` in Go. We do not build or deploy `apiservice` in our scripts and setup.
+The following picture shows the connection graph of the services as defined by Tetrate. We reimplemented `cartservice` and `currencyservice` in Go. We do not build or deploy `apiservice` in our scripts and setup.
 ![Overview Image Coarse](/doc/overview_tetrate.svg)
 Here is our updated and more detailed service architecture, which also shows the functionalities of the services:
 ![Overview Image Detailed](/doc/overview_detail.svg)
