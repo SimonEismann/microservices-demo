@@ -17,6 +17,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -34,6 +35,7 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
+	"gonum.org/v1/gonum/mat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -62,6 +64,27 @@ func init() {
 		TimestampFormat: time.RFC3339Nano,
 	}
 	log.Out = os.Stdout
+}
+
+// passes a time t given in nanoseconds with matrix multiplication
+func passTime(t int64) {
+	if t <= 0 { return }
+	endTime := time.Now().UnixNano() + t
+	for time.Now().UnixNano() < endTime {	// Go does not have while loop. Multiply matrices until endTime is reached
+		a := createMatrix(50)
+		b := createMatrix(50)
+		a.Mul(a,b)
+	}
+}
+
+// helper function for square matrix generation of passTime(t)
+func createMatrix(size int) *mat.Dense {
+	data := make([]float64, size * size)
+	for i := range data {
+		data[i] = rand.NormFloat64()
+	}
+	a := mat.NewDense(size, size, data)
+	return a
 }
 
 // convert cart content to csv
@@ -101,6 +124,9 @@ func cartItemsFromString(data *string) *[]*pb.CartItem {
 
 type cartService struct {
 	redisSvcAddr string
+	addItemDelay int64
+	getCartDelay int64
+	emptyCartDelay int64
 }
 
 func (cs *cartService) ConnectToRedis(c context.Context) *redis.Client {
@@ -120,6 +146,7 @@ func (cs *cartService) ConnectToRedis(c context.Context) *redis.Client {
 }
 
 func (cs *cartService) AddItem(c context.Context, request *pb.AddItemRequest) (*pb.Empty, error) {
+	passTime(cs.addItemDelay)
 	rdb := cs.ConnectToRedis(c)
 	val, err := rdb.Get(c, request.UserId).Result()		// redis maps keys (userId) to value (cart items as string)
 	cart := pb.Cart{UserId: request.UserId}
@@ -151,6 +178,7 @@ func (cs *cartService) AddItem(c context.Context, request *pb.AddItemRequest) (*
 }
 
 func (cs *cartService) GetCart(c context.Context, request *pb.GetCartRequest) (*pb.Cart, error) {
+	passTime(cs.getCartDelay)
 	rdb := cs.ConnectToRedis(c)
 	val, err := rdb.Get(c, request.UserId).Result()		// redis maps keys (userId) to value (cart items as string)
 	cart := pb.Cart{UserId: request.UserId}
@@ -168,6 +196,7 @@ func (cs *cartService) GetCart(c context.Context, request *pb.GetCartRequest) (*
 
 // Deletes cart from redis for specific userId
 func (cs *cartService) EmptyCart(c context.Context, request *pb.EmptyCartRequest) (*pb.Empty, error) {
+	passTime(cs.emptyCartDelay)
 	rdb := cs.ConnectToRedis(c)
 	err := rdb.Del(c, request.UserId).Err()
 	if err != nil {
@@ -184,6 +213,9 @@ func main() {
 	}
 	svc := new(cartService)
 	mustMapEnv(&svc.redisSvcAddr, "REDIS_ADDR")
+	mustMapEnvInt64(&svc.addItemDelay, "DELAY_ADD_ITEM")
+	mustMapEnvInt64(&svc.getCartDelay, "DELAY_GET_CART")
+	mustMapEnvInt64(&svc.emptyCartDelay, "DELAY_EMPTY_CART")
 	log.Infof("service config: %+v", svc)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
@@ -288,6 +320,19 @@ func mustMapEnv(target *string, envKey string) {
 		panic(fmt.Sprintf("environment variable %q not set", envKey))
 	}
 	*target = v
+}
+
+func mustMapEnvInt64(target *int64, envKey string) {
+	v := os.Getenv(envKey)
+	if v == "" {
+		panic(fmt.Sprintf("environment variable %q not set", envKey))
+	}
+	if n, err := strconv.ParseInt(v, 10, 64); err == nil {
+		*target = n
+	} else {
+		panic(fmt.Sprintf("environment variable %q not an int64", envKey))
+	}
+
 }
 
 func (cs *cartService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {

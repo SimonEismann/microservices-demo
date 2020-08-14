@@ -29,6 +29,12 @@ spec:
       - env:
         - name: PORT
           value: "7070"
+        - name: DELAY_ADD_ITEM
+          value: "100000000"    # 100ms, delay <= 0 for no delay
+        - name: DELAY_GET_CART
+          value: "300000000"    # 300ms
+        - name: DELAY_EMPTY_CART
+          value: "50000000"     # 50ms
         - name: REDIS_ADDR
           value: redis-cart:6379
         - name: ZIPKIN_SERVICE_ADDR
