@@ -172,7 +172,7 @@ func initJaegerTracing() {
 	exporter, err := jaeger.NewExporter(jaeger.Options{
 		Endpoint: fmt.Sprintf("http://%s", svcAddr),
 		Process: jaeger.Process{
-			ServiceName: "checkoutservice",
+			ServiceName: "currencyservice",
 		},
 	})
 	if err != nil {
@@ -191,7 +191,7 @@ func initZipkinTracing() {
 		return
 	}
 
-	endpoint, err := openzipkin.NewEndpoint("checkoutservice", "")
+	endpoint, err := openzipkin.NewEndpoint("currencyservice", "")
 	if err != nil {
 		log.Fatalf("unable to create local endpoint: %+v\n", err)
 	}
