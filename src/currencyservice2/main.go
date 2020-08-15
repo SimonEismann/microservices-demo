@@ -50,7 +50,10 @@ const (
 	dataAddress		 = "currency_conversion.json"
 )
 
-var log *logrus.Logger
+var (
+	log *logrus.Logger
+	fractionSize = math.Pow(10, 9)
+)
 
 func init() {
 	log = logrus.New()
@@ -64,6 +67,17 @@ func init() {
 		TimestampFormat: time.RFC3339Nano,
 	}
 	log.Out = os.Stdout
+}
+
+type moneyHelper struct {
+	nanos	float64
+	units	float64
+}
+
+func carry(money *moneyHelper) {
+	money.nanos += math.Mod(money.units, 1.0) * fractionSize
+	money.units = math.Floor(money.units) + math.Floor(money.nanos / fractionSize)
+	money.nanos = math.Mod(money.nanos, fractionSize)
 }
 
 type currencyService struct {
@@ -111,24 +125,34 @@ func (cs *currencyService) GetSupportedCurrencies(c context.Context, empty *pb.E
 
 func (cs *currencyService) Convert(c context.Context, request *pb.CurrencyConversionRequest) (*pb.Money, error) {
 	cs.loadCurrenciesFile()
-	fromCurrency := request.From.CurrencyCode
-	baseFactor, wasFound := (*cs.dataMap)[fromCurrency]	// convert to euro base
+	baseFactor, wasFound := (*cs.dataMap)[request.From.CurrencyCode]	// factor to euro base
 	if !wasFound {
-		log.Fatalf("did not find from-currency " + fromCurrency)
+		log.Fatalf("did not find from-currency " + request.From.CurrencyCode)
 	}
-	baseNanos := math.Round(float64(request.From.Nanos) / baseFactor)
-	baseUnits := float64(request.From.Units) / baseFactor
-	toFactor, wasFound := (*cs.dataMap)[request.ToCode]	// convert to to-currency
+	toFactor, wasFound := (*cs.dataMap)[request.ToCode]					// factor to to-currency
 	if !wasFound {
 		log.Fatalf("did not find to-currency " + request.ToCode)
 	}
-	resUnits := int64(baseUnits * toFactor)
-	resNanos := int32(baseNanos * toFactor)
-	fmt.Printf("converted U:%d N:%d %s to U:%d N:%d %s", request.From.Units, request.From.Nanos, fromCurrency, resUnits, resNanos, request.ToCode)
+
+	// conversion
+	euros := moneyHelper{
+		nanos: float64(request.From.Nanos) / baseFactor,
+		units: float64(request.From.Units) / baseFactor,
+	}
+	carry(&euros)
+	euros.nanos = math.Round(euros.nanos)
+	result := moneyHelper{
+		nanos: euros.nanos * toFactor,
+		units: euros.units * toFactor,
+	}
+	carry(&result)
+	result.units = math.Floor(result.units)
+	result.nanos = math.Floor(result.nanos)
+
 	resp := pb.Money{
 		CurrencyCode:         request.ToCode,
-		Units:                resUnits,
-		Nanos:                resNanos,
+		Units:                int64(result.units),
+		Nanos:                int32(result.nanos),
 	}
 	return &resp, nil
 }
