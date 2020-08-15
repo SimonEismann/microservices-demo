@@ -8,7 +8,7 @@ This repo is a fork of Tetrate's modified version of the GCP Hipstershop/Online 
 - **WIP**: Artificial delays with matrix multiplication
 
 # Overview
-The following picture shows the connection graph of the services as defined by Tetrate. We reimplemented `cartservice` and `currencyservice` in Go. We do not build or deploy `apiservice` in our scripts and setup.
+The following picture shows the connection graph of the services as defined by Tetrate. We reimplemented `cartservice` and `currencyservice` in Go. We do not build or deploy `apiservice` in our scripts and setup. Our `adservice` implementation works with grpc (again).
 ![Overview Image Coarse](/doc/overview_tetrate.svg)
 Here is our updated and more detailed service architecture, which also shows the functionalities of the services:
 ![Overview Image Detailed](/doc/overview_detail.svg)

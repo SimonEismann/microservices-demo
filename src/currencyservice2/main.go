@@ -23,6 +23,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
@@ -77,10 +78,17 @@ func (cs *currencyService) loadCurrenciesFile() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var result map[string]float64
-		err = json.Unmarshal(data, &result)
+		var tempResult map[string]string	// convert json to map
+		err = json.Unmarshal(data, &tempResult)
 		if err != nil {
 			log.Fatal(err)
+		}
+		result := make(map[string]float64)	// convert string values to float64
+		for k, v := range tempResult {
+			result[k], err = strconv.ParseFloat(v, 64)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 		fmt.Printf("found %d currencies\n", len(result))
 		cs.dataMap = &result
