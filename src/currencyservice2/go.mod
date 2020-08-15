@@ -1,4 +1,4 @@
-module github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice
+module github.com/SimonEismann/microservices-demo/src/currencyservice2
 
 go 1.13
 
