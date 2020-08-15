@@ -85,10 +85,12 @@ func (cs *currencyService) loadCurrenciesFile() {
 		}
 		result := make(map[string]float64)	// convert string values to float64
 		for k, v := range tempResult {
-			result[k], err = strconv.ParseFloat(v, 64)
+			convertedValue, err := strconv.ParseFloat(v, 64)
 			if err != nil {
 				log.Fatal(err)
 			}
+			result[k] = convertedValue
+			fmt.Printf("%s: %s -> %f\n", k, v, convertedValue)
 		}
 		fmt.Printf("found %d currencies\n", len(result))
 		cs.dataMap = &result
@@ -120,10 +122,13 @@ func (cs *currencyService) Convert(c context.Context, request *pb.CurrencyConver
 	if !wasFound {
 		log.Fatalf("did not find to-currency " + request.ToCode)
 	}
+	resUnits := int64(baseUnits * toFactor)
+	resNanos := int32(baseNanos * toFactor)
+	fmt.Printf("converted U:%d N:%d %s to U:%d N:%d %s", request.From.Units, request.From.Nanos, fromCurrency, resUnits, resNanos, request.ToCode)
 	resp := pb.Money{
 		CurrencyCode:         request.ToCode,
-		Units:                int64(baseUnits * toFactor),
-		Nanos:                int32(baseNanos * toFactor),
+		Units:                resUnits,
+		Nanos:                resNanos,
 	}
 	return &resp, nil
 }
