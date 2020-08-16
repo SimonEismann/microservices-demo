@@ -40,7 +40,7 @@ from grpc_health.v1 import health_pb2
 from grpc_health.v1 import health_pb2_grpc
 
 from logger import getJSONLogger
-logger = getJSONLogger('recommendationservice-server')
+logger = getJSONLogger('recommendationservice')
 
 # Setup Zipkin exporter
 try: 
@@ -50,7 +50,7 @@ try:
     raise KeyError()
   host, port = zipkin_service_addr.split(":")
   ze = ZipkinExporter(
-    service_name="recommendationservice-server",
+    service_name="recommendationservice",
     host_name=host,
     port=int(port),
     endpoint='/api/v2/spans')

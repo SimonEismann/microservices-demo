@@ -50,7 +50,7 @@ const (
 
 var (
 	log *logrus.Logger
-	cardNumberValidator = regexp.MustCompile(`^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$`)
+	cardNumberValidator = regexp.MustCompile(`^((4\d{3})|(5[1-5]\d{2})|(6011))-?\d{4}-?\d{4}-?\d{4}|3[4,7]\d{13}$`)
 )
 
 func init() {
@@ -70,7 +70,7 @@ func init() {
 type paymentService struct {
 }
 
-// original paymentService only accepts visa and mastercard. we accept every valid card number that is not expired.
+// original paymentService only accepts visa and mastercard. we accept every valid 15/16-digit card number (visa, mastercard, amex, discover) that is not expired.
 func (ps *paymentService) Charge(c context.Context, request *pb.ChargeRequest) (*pb.ChargeResponse, error) {
 	isValid := cardNumberValidator.MatchString(request.CreditCard.CreditCardNumber)
 	isExpired := (request.CreditCard.CreditCardExpirationYear < int32(time.Now().Year())) || (request.CreditCard.CreditCardExpirationYear == int32(time.Now().Year()) && request.CreditCard.CreditCardExpirationMonth < int32(time.Now().Month()))
