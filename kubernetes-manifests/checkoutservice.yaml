@@ -39,6 +39,8 @@ spec:
           value: paymentservice:50051
         - name: PORT
           value: "5050"
+        - name: DELAY_PLACE_ORDER
+          value: "0"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
           value: productcatalogservice:3550
         - name: SHIPPING_SERVICE_ADDR

@@ -17,9 +17,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
@@ -32,12 +34,13 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
+	"gonum.org/v1/gonum/mat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice/genproto"
-	money "github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice/money"
+	pb "github.com/SimonEismann/microservices-demo/src/checkoutservice/genproto"
+	"github.com/SimonEismann/microservices-demo/src/checkoutservice/money"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
@@ -45,7 +48,6 @@ const (
 	listenPort       = "5050"
 	metricsPort      = "5051"
 	healthListenPort = "5052"
-	usdCurrency      = "USD"
 )
 
 var log *logrus.Logger
@@ -64,6 +66,27 @@ func init() {
 	log.Out = os.Stdout
 }
 
+// passes a time t given in nanoseconds with matrix multiplication
+func passTime(t int64) {
+	if t <= 0 { return }
+	endTime := time.Now().UnixNano() + t
+	for time.Now().UnixNano() < endTime {	// Go does not have while loop. Multiply matrices until endTime is reached
+		a := createMatrix(50)
+		b := createMatrix(50)
+		a.Mul(a,b)
+	}
+}
+
+// helper function for square matrix generation of passTime(t)
+func createMatrix(size int) *mat.Dense {
+	data := make([]float64, size * size)
+	for i := range data {
+		data[i] = rand.NormFloat64()
+	}
+	a := mat.NewDense(size, size, data)
+	return a
+}
+
 type checkoutService struct {
 	productCatalogSvcAddr string
 	cartSvcAddr           string
@@ -71,6 +94,8 @@ type checkoutService struct {
 	shippingSvcAddr       string
 	emailSvcAddr          string
 	paymentSvcAddr        string
+	placeOrderDelay		  int64
+
 }
 
 func main() {
@@ -88,6 +113,7 @@ func main() {
 	mustMapEnv(&svc.currencySvcAddr, "CURRENCY_SERVICE_ADDR")
 	mustMapEnv(&svc.emailSvcAddr, "EMAIL_SERVICE_ADDR")
 	mustMapEnv(&svc.paymentSvcAddr, "PAYMENT_SERVICE_ADDR")
+	mustMapEnvInt64(&svc.placeOrderDelay, "DELAY_PLACE_ORDER")
 
 	log.Infof("service config: %+v", svc)
 
@@ -217,6 +243,19 @@ func mustMapEnv(target *string, envKey string) {
 	*target = v
 }
 
+func mustMapEnvInt64(target *int64, envKey string) {
+	v := os.Getenv(envKey)
+	if v == "" {
+		panic(fmt.Sprintf("environment variable %q not set", envKey))
+	}
+	if n, err := strconv.ParseInt(v, 10, 64); err == nil {
+		*target = n
+	} else {
+		panic(fmt.Sprintf("environment variable %q not an int64", envKey))
+	}
+
+}
+
 func (cs *checkoutService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
 	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
 }
@@ -226,6 +265,7 @@ func (cs *checkoutService) Watch(req *healthpb.HealthCheckRequest, ws healthpb.H
 }
 
 func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.PlaceOrderResponse, error) {
+	passTime(cs.placeOrderDelay)
 	log.Infof("[PlaceOrder] user_id=%q user_currency=%q", req.UserId, req.UserCurrency)
 
 	orderID, err := uuid.NewUUID()
@@ -436,5 +476,3 @@ func (cs *checkoutService) shipOrder(ctx context.Context, address *pb.Address, i
 	}
 	return resp.GetTrackingId(), nil
 }
-
-// TODO: Dial and create client once, reuse.

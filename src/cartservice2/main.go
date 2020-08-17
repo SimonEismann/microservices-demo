@@ -332,7 +332,6 @@ func mustMapEnvInt64(target *int64, envKey string) {
 	} else {
 		panic(fmt.Sprintf("environment variable %q not an int64", envKey))
 	}
-
 }
 
 func (cs *cartService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {

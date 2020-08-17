@@ -1,4 +1,4 @@
-module github.com/GoogleCloudPlatform/microservices-demo/src/checkoutservice
+module github.com/SimonEismann/microservices-demo/src/checkoutservice
 
 go 1.13
 
@@ -12,5 +12,6 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	go.opencensus.io v0.22.2
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
+	gonum.org/v1/gonum v0.8.0
 	google.golang.org/grpc v1.27.0
 )

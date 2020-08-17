@@ -7,3 +7,4 @@ google-cloud-profiler==1.0.8
 opencensus==0.7.6
 opencensus-ext-zipkin==0.2.2
 opencensus-ext-grpc
+numpy

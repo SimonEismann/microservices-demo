@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
@@ -19,6 +21,7 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
+	"gonum.org/v1/gonum/mat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -49,8 +52,30 @@ func init() {
 	log.Out = os.Stdout
 }
 
+// passes a time t given in nanoseconds with matrix multiplication
+func passTime(t int64) {
+	if t <= 0 { return }
+	endTime := time.Now().UnixNano() + t
+	for time.Now().UnixNano() < endTime {	// Go does not have while loop. Multiply matrices until endTime is reached
+		a := createMatrix(50)
+		b := createMatrix(50)
+		a.Mul(a,b)
+	}
+}
+
+// helper function for square matrix generation of passTime(t)
+func createMatrix(size int) *mat.Dense {
+	data := make([]float64, size * size)
+	for i := range data {
+		data[i] = rand.NormFloat64()
+	}
+	a := mat.NewDense(size, size, data)
+	return a
+}
+
 type adService struct {
 	ads         []*pb.Ad
+	getAdsDelay	int64
 }
 
 func main() {
@@ -62,7 +87,7 @@ func main() {
 	}
 
 	svc := new(adService)
-
+	mustMapEnvInt64(&svc.getAdsDelay, "DELAY_GETADS")
 	log.Infof("service config: %+v", svc)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
@@ -183,6 +208,18 @@ func initTracing() {
 	initZipkinTracing()
 }
 
+func mustMapEnvInt64(target *int64, envKey string) {
+	v := os.Getenv(envKey)
+	if v == "" {
+		panic(fmt.Sprintf("environment variable %q not set", envKey))
+	}
+	if n, err := strconv.ParseInt(v, 10, 64); err == nil {
+		*target = n
+	} else {
+		panic(fmt.Sprintf("environment variable %q not an int64", envKey))
+	}
+}
+
 func (a *adService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
 	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
 }
@@ -206,6 +243,7 @@ func (a *adService) loadAdsFile() error {
 }
 
 func (a *adService) GetAds(ctx context.Context, req *pb.AdRequest) (*pb.AdResponse, error) {
+	passTime(a.getAdsDelay)
 	log.Infof("[GetAds] contextKeys=%q", req.ContextKeys)
 
 	resp := &pb.AdResponse{Ads: a.ads}

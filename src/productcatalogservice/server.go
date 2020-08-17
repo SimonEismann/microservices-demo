@@ -20,16 +20,16 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
-	"os/signal"
+	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
-	pb "github.com/GoogleCloudPlatform/microservices-demo/src/productcatalogservice/genproto"
+	pb "github.com/SimonEismann/microservices-demo/src/productcatalogservice/genproto"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
 	"github.com/golang/protobuf/jsonpb"
@@ -37,6 +37,7 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
+	"gonum.org/v1/gonum/mat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -52,14 +53,26 @@ var (
 	cat          pb.ListProductsResponse
 	catalogMutex *sync.Mutex
 	log          *logrus.Logger
-	extraLatency time.Duration
+	listProductsDelay 	int64
+	getProductDelay   	int64
+	searchProductsDelay	int64
 
 	port        = "3550"
 	metricsPort = "3551"
 	healthPort  = "3552"
-
-	reloadCatalog bool
 )
+
+func mustMapEnvInt64(target *int64, envKey string) {
+	v := os.Getenv(envKey)
+	if v == "" {
+		panic(fmt.Sprintf("environment variable %q not set", envKey))
+	}
+	if n, err := strconv.ParseInt(v, 10, 64); err == nil {
+		*target = n
+	} else {
+		panic(fmt.Sprintf("environment variable %q not an int64", envKey))
+	}
+}
 
 func init() {
 	log = logrus.New()
@@ -79,37 +92,39 @@ func init() {
 	}
 }
 
+// passes a time t given in nanoseconds with matrix multiplication
+func passTime(t int64) {
+	if t <= 0 { return }
+	endTime := time.Now().UnixNano() + t
+	for time.Now().UnixNano() < endTime {	// Go does not have while loop. Multiply matrices until endTime is reached
+		a := createMatrix(50)
+		b := createMatrix(50)
+		a.Mul(a,b)
+	}
+}
+
+// helper function for square matrix generation of passTime(t)
+func createMatrix(size int) *mat.Dense {
+	data := make([]float64, size * size)
+	for i := range data {
+		data[i] = rand.NormFloat64()
+	}
+	a := mat.NewDense(size, size, data)
+	return a
+}
+
 func main() {
 	go initTracing()
 	flag.Parse()
 
-	// set injected latency
-	if s := os.Getenv("EXTRA_LATENCY"); s != "" {
-		v, err := time.ParseDuration(s)
-		if err != nil {
-			log.Fatalf("failed to parse EXTRA_LATENCY (%s) as time.Duration: %+v", v, err)
-		}
-		extraLatency = v
-		log.Infof("extra latency enabled (duration: %v)", extraLatency)
-	} else {
-		extraLatency = time.Duration(0)
-	}
+	mustMapEnvInt64(&listProductsDelay, "DELAY_LIST_PRODUCTS")
+	mustMapEnvInt64(&getProductDelay, "DELAY_GET_PRODUCT")
+	mustMapEnvInt64(&searchProductsDelay, "DELAY_SEARCH_PRODUCTS")
 
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGUSR1, syscall.SIGUSR2)
-	go func() {
-		for {
-			sig := <-sigs
-			log.Printf("Received signal: %s", sig)
-			if sig == syscall.SIGUSR1 {
-				reloadCatalog = true
-				log.Infof("Enable catalog reloading")
-			} else {
-				reloadCatalog = false
-				log.Infof("Disable catalog reloading")
-			}
-		}
-	}()
+	err := readCatalogFile(&cat)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")
@@ -241,12 +256,6 @@ func readCatalogFile(catalog *pb.ListProductsResponse) error {
 }
 
 func parseCatalog() []*pb.Product {
-	if reloadCatalog || len(cat.Products) == 0 {
-		err := readCatalogFile(&cat)
-		if err != nil {
-			return []*pb.Product{}
-		}
-	}
 	return cat.Products
 }
 
@@ -259,12 +268,12 @@ func (p *productCatalog) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Hea
 }
 
 func (p *productCatalog) ListProducts(context.Context, *pb.Empty) (*pb.ListProductsResponse, error) {
-	time.Sleep(extraLatency)
+	passTime(listProductsDelay)
 	return &pb.ListProductsResponse{Products: parseCatalog()}, nil
 }
 
 func (p *productCatalog) GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb.Product, error) {
-	time.Sleep(extraLatency)
+	passTime(getProductDelay)
 	var found *pb.Product
 	for i := 0; i < len(parseCatalog()); i++ {
 		if req.Id == parseCatalog()[i].Id {
@@ -278,7 +287,7 @@ func (p *productCatalog) GetProduct(ctx context.Context, req *pb.GetProductReque
 }
 
 func (p *productCatalog) SearchProducts(ctx context.Context, req *pb.SearchProductsRequest) (*pb.SearchProductsResponse, error) {
-	time.Sleep(extraLatency)
+	passTime(searchProductsDelay)
 	// Intepret query as a substring match in name or description.
 	var ps []*pb.Product
 	for _, p := range parseCatalog() {

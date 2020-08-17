@@ -29,6 +29,10 @@ spec:
       - env:
         - name: PORT
           value: "7000"
+        - name: DELAY_CONVERT
+          value: "0"
+        - name: DELAY_GET_CURRENCIES
+          value: "0"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
         image: simoneismann/currencyservice2:master

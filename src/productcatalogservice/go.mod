@@ -1,4 +1,4 @@
-module github.com/GoogleCloudPlatform/microservices-demo/src/productcatalogservice
+module github.com/SimonEismann/microservices-demo/src/productcatalogservice
 
 go 1.13
 
@@ -8,7 +8,7 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7 // indirect
 	github.com/golang/protobuf v1.3.2
-	github.com/google/go-cmp v0.4.0
+	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/sirupsen/logrus v1.4.2
@@ -16,6 +16,7 @@ require (
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20200113162924-86b910548bc1 // indirect
+	gonum.org/v1/gonum v0.8.0
 	google.golang.org/api v0.15.0 // indirect
 	google.golang.org/genproto v0.0.0-20200115191322-ca5a22157cba // indirect
 	google.golang.org/grpc v1.27.0

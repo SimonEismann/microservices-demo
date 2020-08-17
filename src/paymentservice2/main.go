@@ -19,10 +19,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
@@ -34,6 +36,7 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
+	"gonum.org/v1/gonum/mat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -67,11 +70,34 @@ func init() {
 	log.Out = os.Stdout
 }
 
+// passes a time t given in nanoseconds with matrix multiplication
+func passTime(t int64) {
+	if t <= 0 { return }
+	endTime := time.Now().UnixNano() + t
+	for time.Now().UnixNano() < endTime {	// Go does not have while loop. Multiply matrices until endTime is reached
+		a := createMatrix(50)
+		b := createMatrix(50)
+		a.Mul(a,b)
+	}
+}
+
+// helper function for square matrix generation of passTime(t)
+func createMatrix(size int) *mat.Dense {
+	data := make([]float64, size * size)
+	for i := range data {
+		data[i] = rand.NormFloat64()
+	}
+	a := mat.NewDense(size, size, data)
+	return a
+}
+
 type paymentService struct {
+	chargeDelay	int64
 }
 
 // original paymentService only accepts visa and mastercard. we accept every valid 15/16-digit card number (visa, mastercard, amex, discover) that is not expired.
 func (ps *paymentService) Charge(c context.Context, request *pb.ChargeRequest) (*pb.ChargeResponse, error) {
+	passTime(ps.chargeDelay)
 	isValid := cardNumberValidator.MatchString(request.CreditCard.CreditCardNumber)
 	isExpired := (request.CreditCard.CreditCardExpirationYear < int32(time.Now().Year())) || (request.CreditCard.CreditCardExpirationYear == int32(time.Now().Year()) && request.CreditCard.CreditCardExpirationMonth < int32(time.Now().Month()))
 
@@ -102,7 +128,7 @@ func main() {
 	}
 
 	svc := new(paymentService)
-	//mustMapEnv(&svc.shippingSvcAddr, "SHIPPING_SERVICE_ADDR")
+	mustMapEnvInt64(&svc.chargeDelay, "DELAY_CHARGE")
 
 	log.Infof("service config: %+v", svc)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
@@ -208,6 +234,18 @@ func mustMapEnv(target *string, envKey string) {
 		panic(fmt.Sprintf("environment variable %q not set", envKey))
 	}
 	*target = v
+}
+
+func mustMapEnvInt64(target *int64, envKey string) {
+	v := os.Getenv(envKey)
+	if v == "" {
+		panic(fmt.Sprintf("environment variable %q not set", envKey))
+	}
+	if n, err := strconv.ParseInt(v, 10, 64); err == nil {
+		*target = n
+	} else {
+		panic(fmt.Sprintf("environment variable %q not an int64", envKey))
+	}
 }
 
 func (ps *paymentService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -35,6 +36,7 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
+	"gonum.org/v1/gonum/mat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -69,6 +71,27 @@ func init() {
 	log.Out = os.Stdout
 }
 
+// passes a time t given in nanoseconds with matrix multiplication
+func passTime(t int64) {
+	if t <= 0 { return }
+	endTime := time.Now().UnixNano() + t
+	for time.Now().UnixNano() < endTime {	// Go does not have while loop. Multiply matrices until endTime is reached
+		a := createMatrix(50)
+		b := createMatrix(50)
+		a.Mul(a,b)
+	}
+}
+
+// helper function for square matrix generation of passTime(t)
+func createMatrix(size int) *mat.Dense {
+	data := make([]float64, size * size)
+	for i := range data {
+		data[i] = rand.NormFloat64()
+	}
+	a := mat.NewDense(size, size, data)
+	return a
+}
+
 type moneyHelper struct {
 	nanos	float64
 	units	float64
@@ -83,6 +106,8 @@ func carry(money *moneyHelper) {
 type currencyService struct {
 	dataAddr	string
 	dataMap 	*map[string]float64
+	convertDelay	int64
+	getCurrenciesDelay	int64
 }
 
 // helper function to load the currency_conversion.json
@@ -112,6 +137,7 @@ func (cs *currencyService) loadCurrenciesFile() {
 }
 
 func (cs *currencyService) GetSupportedCurrencies(c context.Context, empty *pb.Empty) (*pb.GetSupportedCurrenciesResponse, error) {
+	passTime(cs.getCurrenciesDelay)
 	cs.loadCurrenciesFile()
 	keys := make([]string, 0, len(*cs.dataMap))
 	for k := range *cs.dataMap {
@@ -124,6 +150,7 @@ func (cs *currencyService) GetSupportedCurrencies(c context.Context, empty *pb.E
 }
 
 func (cs *currencyService) Convert(c context.Context, request *pb.CurrencyConversionRequest) (*pb.Money, error) {
+	passTime(cs.convertDelay)
 	cs.loadCurrenciesFile()
 	baseFactor, wasFound := (*cs.dataMap)[request.From.CurrencyCode]	// factor to euro base
 	if !wasFound {
@@ -165,6 +192,8 @@ func main() {
 	}
 	svc := new(currencyService)
 	svc.dataAddr = dataAddress
+	mustMapEnvInt64(&svc.convertDelay, "DELAY_CONVERT")
+	mustMapEnvInt64(&svc.getCurrenciesDelay, "DELAY_GET_CURRENCIES")
 	if os.Getenv("DATA_ADDR") != "" {
 		port = os.Getenv("DATA_ADDR")
 	}
@@ -283,6 +312,19 @@ func mustMapEnv(target *string, envKey string) {
 		panic(fmt.Sprintf("environment variable %q not set", envKey))
 	}
 	*target = v
+}
+
+func mustMapEnvInt64(target *int64, envKey string) {
+	v := os.Getenv(envKey)
+	if v == "" {
+		panic(fmt.Sprintf("environment variable %q not set", envKey))
+	}
+	if n, err := strconv.ParseInt(v, 10, 64); err == nil {
+		*target = n
+	} else {
+		panic(fmt.Sprintf("environment variable %q not an int64", envKey))
+	}
+
 }
 
 func (cs *currencyService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {

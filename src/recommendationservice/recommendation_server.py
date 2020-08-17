@@ -17,30 +17,34 @@
 import os
 import random
 import time
-import traceback
 from concurrent import futures
 
-# import googleclouddebugger
-# import googlecloudprofiler
 import grpc
-# from opencensus.trace.exporters import print_exporter
-# from opencensus.trace.exporters import stackdriver_exporter
-# from opencensus.trace.ext.grpc import server_interceptor
-# from opencensus.trace.samplers import always_on
-
+import numpy as np
+from grpc_health.v1 import health_pb2
+from grpc_health.v1 import health_pb2_grpc
 from opencensus.ext.grpc import server_interceptor
-from opencensus.trace.tracer import Tracer
 from opencensus.ext.zipkin.trace_exporter import ZipkinExporter
 from opencensus.trace.samplers import AlwaysOnSampler
-from opencensus.trace import config_integration
+from opencensus.trace.tracer import Tracer
 
 import demo_pb2
 import demo_pb2_grpc
-from grpc_health.v1 import health_pb2
-from grpc_health.v1 import health_pb2_grpc
-
 from logger import getJSONLogger
+
 logger = getJSONLogger('recommendationservice')
+
+# passes time t (in nanoseconds)
+def passTime(t):
+    if t <= 0:
+        return
+    endTime = time.time_ns() + t  # get unix timestamp in nanoseconds
+    while time.time_ns() < endTime:  # create and multiply two random 50x50 matrices (values in [0,1)) until endtime is reached
+        m1 = np.random.rand(50, 50)
+        m2 = np.random.rand(50, 50)
+        np.matmul(m1, m2)
+
+sendConfirmationDelay = int(os.environ.get("DELAY_LIST_RECOMMS", '0'))
 
 # Setup Zipkin exporter
 try: 
@@ -63,6 +67,7 @@ except KeyError:
 
 class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
     def ListRecommendations(self, request, context):
+        passTime(sendConfirmationDelay)
         max_responses = 5
         # fetch list of products from product catalog stub
         cat_response = product_catalog_stub.ListProducts(demo_pb2.Empty())

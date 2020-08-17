@@ -16,9 +16,11 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -36,8 +38,9 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
+	"gonum.org/v1/gonum/mat"
 
-	pb "github.com/GoogleCloudPlatform/microservices-demo/src/shippingservice/genproto"
+	pb "github.com/SimonEismann/microservices-demo/src/shippingservice/genproto"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
@@ -63,6 +66,27 @@ func init() {
 	log.Out = os.Stdout
 }
 
+// passes a time t given in nanoseconds with matrix multiplication
+func passTime(t int64) {
+	if t <= 0 { return }
+	endTime := time.Now().UnixNano() + t
+	for time.Now().UnixNano() < endTime {	// Go does not have while loop. Multiply matrices until endTime is reached
+		a := createMatrix(50)
+		b := createMatrix(50)
+		a.Mul(a,b)
+	}
+}
+
+// helper function for square matrix generation of passTime(t)
+func createMatrix(size int) *mat.Dense {
+	data := make([]float64, size * size)
+	for i := range data {
+		data[i] = rand.NormFloat64()
+	}
+	a := mat.NewDense(size, size, data)
+	return a
+}
+
 func main() {
 	go initTracing()
 
@@ -78,6 +102,8 @@ func main() {
 	}
 	srv := grpc.NewServer(grpc.StatsHandler(&ocgrpc.ServerHandler{}))
 	svc := &server{}
+	mustMapEnvInt64(&svc.getQuoteDelay, "DELAY_GET_QUOTE")
+	mustMapEnvInt64(&svc.shipOrderDelay, "DELAY_SHIP_ORDER")
 	pb.RegisterShippingServiceServer(srv, svc)
 	log.Infof("Shipping Service listening on port %s", port)
 
@@ -111,7 +137,10 @@ func main() {
 }
 
 // server controls RPC service responses.
-type server struct{}
+type server struct{
+	shipOrderDelay	int64
+	getQuoteDelay	int64
+}
 
 // Check is for health checking.
 func (s *server) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
@@ -124,6 +153,7 @@ func (s *server) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_Watc
 
 // GetQuote produces a shipping quote (cost) in USD.
 func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQuoteResponse, error) {
+	passTime(s.getQuoteDelay)
 	log.Info("[GetQuote] received request")
 	defer log.Info("[GetQuote] completed request")
 
@@ -149,6 +179,7 @@ func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQ
 // ShipOrder mocks that the requested items will be shipped.
 // It supplies a tracking ID for notional lookup of shipment delivery status.
 func (s *server) ShipOrder(ctx context.Context, in *pb.ShipOrderRequest) (*pb.ShipOrderResponse, error) {
+	passTime(s.shipOrderDelay)
 	log.Info("[ShipOrder] received request")
 	defer log.Info("[ShipOrder] completed request")
 	// 1. Create a Tracking ID
@@ -231,12 +262,19 @@ func initStats(exporter *prometheus.Exporter) {
 }
 
 func initTracing() {
-	// This is a demo app with low QPS. trace.AlwaysSample() is used here
-	// to make sure traces are available for observation and analysis.
-	// In a production environment or high QPS setup please use
-	// trace.ProbabilitySampler set at the desired probability.
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
-
 	initJaegerTracing()
 	initZipkinTracing()
+}
+
+func mustMapEnvInt64(target *int64, envKey string) {
+	v := os.Getenv(envKey)
+	if v == "" {
+		panic(fmt.Sprintf("environment variable %q not set", envKey))
+	}
+	if n, err := strconv.ParseInt(v, 10, 64); err == nil {
+		*target = n
+	} else {
+		panic(fmt.Sprintf("environment variable %q not an int64", envKey))
+	}
 }

@@ -29,6 +29,8 @@ spec:
       - env:
         - name: ENABLE_PROFILER
           value: "0"
+        - name: DELAY_SEND_CONFIRMATION
+          value: "0"
         - name: HEALTH_PORT
           value: "8081"
         - name: PORT
