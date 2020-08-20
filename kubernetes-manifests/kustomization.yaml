@@ -10,7 +10,6 @@ resources:
 - currencyservice.yaml
 - emailservice.yaml
 - frontend.yaml
-- loadgenerator.yaml
 - mysql.yaml
 - paymentservice.yaml
 - productcatalogservice.yaml

@@ -5,10 +5,10 @@ This repo is a fork of Tetrate's modified version of the GCP Hipstershop/Online 
 - Rewrite of `adservice`, `cartservice`, `currencyservice` and `paymentservice` in Go.
 - Lots of smaller fixes.
 - Ready to use deployment (with and without Istio) and data extraction scripts.
-- Artificial delays with matrix multiplication for all microservices.
+- Artificial delays (constant workload) with matrix multiplication for all microservices.
 
 # Overview
-The following picture shows the connection graph of the services as defined by Tetrate. We reimplemented `cartservice`, `currencyservice` and `paymentservice` in **Go**. We do not build or deploy `apiservice` in our scripts and setup. Our `adservice` implementation works with grpc (again).
+The following picture shows the connection graph of the services as defined by Tetrate. We reimplemented `cartservice`, `currencyservice` and `paymentservice` in **Go**. We do not build or deploy `apiservice` in our scripts and setup. Our `adservice` implementation works with grpc (again). The ingress gateway is no longer necessary to access the webpage.
 ![Overview Image Coarse](/doc/overview_tetrate.svg)
 Here is our (slightly) updated and more detailed service architecture, which also shows the functionalities of the services:
 ![Overview Image Detailed](/doc/overview_detail.svg)
@@ -59,7 +59,7 @@ cd ..
 cd se-microservices-demo/
 kubectl label namespace default istio-injection=enabled
 kubectl apply -f ./istio-manifests
-kubectl apply -k ./kubernetes-manifests/kustomization.yaml	# deployment with loadgenerator, kustomization_no_loadgen.yaml to deploy without
+kubectl apply -f ./kubernetes-manifests
 istioctl analyze
 INGRESS_HOST="$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
 echo "$INGRESS_HOST"	# website can be accessed by local browser at this address

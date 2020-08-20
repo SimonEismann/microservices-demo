@@ -7,4 +7,4 @@ gcloud services enable containerregistry.googleapis.com
 gcloud auth configure-docker -q
 gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE --project $PROJECT_ID
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value core/account)
-kubectl apply -k ./kubernetes-manifests/kustomization_no_loadgen.yaml
+kubectl apply -k ./kubernetes-manifests		# deploys without loadgen
