@@ -1,32 +1,20 @@
-FROM node:8-alpine as base
+FROM golang:1.13-alpine as builder
+RUN apk add --no-cache ca-certificates git && \
+      wget -qO/go/bin/dep https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 && \
+      chmod +x /go/bin/dep
 
-FROM base as builder
+ENV PROJECT github.com/SimonEismann/microservices-demo/src/currencyservice
+WORKDIR /go/src/$PROJECT
 
-# Some packages (e.g. @google-cloud/profiler) require additional
-# deps for post-install scripts
-RUN apk add --update --no-cache \
-    python \
-    make \
-    g++
+COPY . .
+RUN go build -gcflags='-N -l' -o /currencyservice .
 
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install --only=production
-
-FROM base
-
+FROM alpine as release
+RUN apk add --no-cache ca-certificates
 RUN GRPC_HEALTH_PROBE_VERSION=v0.2.0 && \
     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
     chmod +x /bin/grpc_health_probe
-
-WORKDIR /usr/src/app
-
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-
-COPY . .
-
-EXPOSE 7000 7001
-
-ENTRYPOINT [ "node", "server.js" ]
+COPY --from=builder /currencyservice /currencyservice
+COPY ./currency_conversion.json ./currency_conversion.json
+EXPOSE 7000 7002
+ENTRYPOINT ["/currencyservice"]

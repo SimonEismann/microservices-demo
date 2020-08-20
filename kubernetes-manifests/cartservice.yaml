@@ -32,14 +32,14 @@ spec:
         - name: DELAY_ADD_ITEM
           value: "0"    # delay <= 0 for no delay
         - name: DELAY_GET_CART
-          value: "50000000"
+          value: "0"
         - name: DELAY_EMPTY_CART
           value: "0"
         - name: REDIS_ADDR
           value: redis-cart:6379
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/cartservice2:master
+        image: simoneismann/cartservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:

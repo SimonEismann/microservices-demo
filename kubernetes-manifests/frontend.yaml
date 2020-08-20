@@ -47,6 +47,20 @@ spec:
           value: :8080
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
+        - name: DELAY_HOME
+          value: "0"
+        - name: DELAY_PRODUCT
+          value: "0"
+        - name: DELAY_CART_GET
+          value: "0"
+        - name: DELAY_CART_ADD
+          value: "0"
+        - name: DELAY_CART_EMPTY
+          value: "0"
+        - name: DELAY_CHECKOUT
+          value: "0"
+        - name: DELAY_SET_CURRENCY
+          value: "0"
         image: simoneismann/frontend:master
         imagePullPolicy: Always
         livenessProbe:
@@ -89,7 +103,7 @@ spec:
   selector:
     app: frontend
     project: hipstershopistio
-  type: ClusterIP
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: ServiceAccount

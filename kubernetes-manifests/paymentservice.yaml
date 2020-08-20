@@ -35,7 +35,7 @@ spec:
           value: "50051"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/paymentservice2:master
+        image: simoneismann/paymentservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:

@@ -35,7 +35,7 @@ spec:
           value: "0"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/currencyservice2:master
+        image: simoneismann/currencyservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:

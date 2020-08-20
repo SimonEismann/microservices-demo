@@ -17,7 +17,7 @@ package money
 import (
 	"errors"
 
-	pb "github.com/tetratelabs/microservices-demo/src/frontend/genproto"
+	pb "github.com/SimonEismann/microservices-demo/src/frontend/genproto"
 )
 
 const (

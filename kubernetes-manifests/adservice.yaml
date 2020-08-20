@@ -30,12 +30,12 @@ spec:
         - name: HEALTH_PORT
           value: "9557"
         - name: DELAY_GETADS
-          value: "1000000000"
+          value: "10000"    # DEBUG
         - name: PORT
           value: "9555"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/adservice3:master
+        image: simoneismann/adservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:

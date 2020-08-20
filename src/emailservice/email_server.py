@@ -33,12 +33,11 @@ from logger import getJSONLogger
 
 logger = getJSONLogger('emailservice')
 
-# passes time t (in nanoseconds)
+# passes time by multiplying matrices t times
 def passTime(t):
     if t <= 0:
         return
-    endTime = time.time_ns() + t  # get unix timestamp in nanoseconds
-    while time.time_ns() < endTime:  # create and multiply two random 50x50 matrices (values in [0,1)) until endtime is reached
+    for i in range(t):  # create and multiply two random 50x50 matrices (values in [0,1)) until t is reached
         m1 = np.random.rand(50, 50)
         m2 = np.random.rand(50, 50)
         np.matmul(m1, m2)

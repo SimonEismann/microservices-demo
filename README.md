@@ -4,14 +4,18 @@ This repo is a fork of Tetrate's modified version of the GCP Hipstershop/Online 
 - Deployment with pre-built Zipkin and MySQL instances to allow for fast data generation and extraction.
 - Rewrite of `adservice`, `cartservice`, `currencyservice` and `paymentservice` in Go.
 - Lots of smaller fixes.
-- Ready to use deployment (with Istio) and data extraction scripts.
-- Artificial delays with matrix multiplication for all microservices except `frontend`.
+- Ready to use deployment (with and without Istio) and data extraction scripts.
+- Artificial delays with matrix multiplication for all microservices.
 
 # Overview
 The following picture shows the connection graph of the services as defined by Tetrate. We reimplemented `cartservice`, `currencyservice` and `paymentservice` in **Go**. We do not build or deploy `apiservice` in our scripts and setup. Our `adservice` implementation works with grpc (again).
 ![Overview Image Coarse](/doc/overview_tetrate.svg)
 Here is our (slightly) updated and more detailed service architecture, which also shows the functionalities of the services:
 ![Overview Image Detailed](/doc/overview_detail.svg)
+
+# Artificial Delays
+Artificial delays can be activated by setting the `DELAY_*` environment variables in the `.yaml` deployment files in the `kubernetes-manifests` folder. The variables (64-bit signed) have to be set to positive integers to activate the feature.
+The delay variable describes the amount of matrix (random values, constant size) multiplications computed before the actual task.
 
 # Building Images
 Images are built automatically using a Github Action.
@@ -31,6 +35,7 @@ TAG=v0.1.8 REPO_PREFIX=my.docker.hub ./hack/make-docker-images.sh
 ```
 
 # Deployment in Google Cloud Shell
+Either execute `deploy_gcp_raw.sh` from the repository root to deploy the system without Istio, or use the following scripts as a guideline to deploy the system with Istio:
 ```shell
 # install files (only needed once)
 curl -L https://istio.io/downloadIstio | sh - # download newest istio release
@@ -54,7 +59,7 @@ cd ..
 cd se-microservices-demo/
 kubectl label namespace default istio-injection=enabled
 kubectl apply -f ./istio-manifests
-kubectl apply -f ./kubernetes-manifests
+kubectl apply -k ./kubernetes-manifests/kustomization.yaml	# deployment with loadgenerator, kustomization_no_loadgen.yaml to deploy without
 istioctl analyze
 INGRESS_HOST="$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
 echo "$INGRESS_HOST"	# website can be accessed by local browser at this address

@@ -65,6 +65,14 @@ var (
 	jaegerSvcAddr         = flag.String("JAEGER_SERVICE_ADDR", "", "URL to Jaeger Tracing agent")
 	zipkinSvcAddr         = flag.String("ZIPKIN_SERVICE_ADDR", "", "URL to Zipkin Tracing agent (ex: zipkin:9411)")
 
+	delayHome			  = flag.Int64("DELAY_HOME", 0, "Additional delay when accessing frontpage (default: 0)")
+	delayProduct		  = flag.Int64("DELAY_PRODUCT", 0, "Additional delay when accessing product page (default: 0)")
+	delayCartGet		  = flag.Int64("DELAY_CART_GET", 0, "Additional delay when accessing cart page (default: 0)")
+	delayCartAdd		  = flag.Int64("DELAY_CART_ADD", 0, "Additional delay when adding item to cart (default: 0)")
+	delayCartEmpty		  = flag.Int64("DELAY_CART_EMPTY", 0, "Additional delay when deleting cart (default: 0)")
+	delayCheckout		  = flag.Int64("DELAY_CHECKOUT", 0, "Additional delay when checking out the cart (default: 0)")
+	delaySetCurr		  = flag.Int64("DELAY_SET_CURRENCY", 0, "Additional delay when setting currency (default: 0)")
+
 	whitelistedCurrencies = map[string]bool{
 		"USD": true,
 		"EUR": true,
@@ -97,6 +105,14 @@ type frontendServer struct {
 
 	adSvcAddr string
 	adSvcConn *grpc.ClientConn
+
+	delayHome 		int64
+	delayProduct	int64
+	delayCartGet	int64
+	delayCartAdd	int64
+	delayCartEmpty	int64
+	delayCheckout	int64
+	delaySetCurr	int64
 }
 
 func main() {
@@ -136,6 +152,13 @@ func main() {
 		productCatalogSvcAddr: *productCatalogSvcAddr,
 		recommendationSvcAddr: *recommendationSvcAddr,
 		shippingSvcAddr:       *shippingSvcAddr,
+		delayHome:			   *delayHome,
+		delayProduct:		   *delayProduct,
+		delayCartGet:		   *delayCartGet,
+		delayCartAdd:		   *delayCartAdd,
+		delayCartEmpty:		   *delayCartEmpty,
+		delayCheckout:		   *delayCheckout,
+		delaySetCurr:		   *delaySetCurr,
 	}
 
 	mustConnGRPC(ctx, &svc.currencySvcConn, svc.currencySvcAddr)

@@ -16,7 +16,7 @@
 
 #!/bin/bash -e
 
-# protos are needed in adservice folder for compiling during Docker build.
+PATH=$PATH:$GOPATH/bin
+protodir=../../pb
 
-mkdir -p proto && \
-cp ../../pb/demo.proto src/main/proto
+protoc --go_out=plugins=grpc:genproto -I $protodir $protodir/demo.proto

@@ -14,13 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Generate the C# code for .proto files
-set -e
+#!/bin/bash -e
 
-PROTODIR=../../pb
+PATH=$PATH:$GOPATH/bin
+protodir=../../pb
 
-# enter this directory
-CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-protoc --csharp_out=$CWD/grpc_generated -I $PROTODIR $PROTODIR/demo.proto
-
+protoc --go_out=plugins=grpc:genproto -I $protodir $protodir/demo.proto

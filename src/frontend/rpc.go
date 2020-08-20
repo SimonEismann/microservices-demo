@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	pb "github.com/tetratelabs/microservices-demo/src/frontend/genproto"
+	pb "github.com/SimonEismann/microservices-demo/src/frontend/genproto"
 
 	"github.com/pkg/errors"
 )

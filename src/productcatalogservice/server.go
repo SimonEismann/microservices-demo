@@ -92,11 +92,10 @@ func init() {
 	}
 }
 
-// passes a time t given in nanoseconds with matrix multiplication
+// repeats multiplication of random 50x50 matrices t times
 func passTime(t int64) {
 	if t <= 0 { return }
-	endTime := time.Now().UnixNano() + t
-	for time.Now().UnixNano() < endTime {	// Go does not have while loop. Multiply matrices until endTime is reached
+	for i := int64(0); i < t; i++ {
 		a := createMatrix(50)
 		b := createMatrix(50)
 		a.Mul(a,b)
