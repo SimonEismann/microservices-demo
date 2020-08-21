@@ -10,7 +10,8 @@ services=(adservice cartservice checkoutservice currencyservice emailservice fro
 
 gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE}
 
-nodes=`kubectl get nodes | grep -vP '^NAME' | grep -oP '^[\w\-0-9]+')`
+nodes_string=`kubectl get nodes | grep -vP '^NAME' | grep -oP '^[\w\-0-9]+'`
+readarray -t nodes <<< "$nodes_string"
 
 for index in "${!services[@]}"; do kubectl label nodes ${nodes[index]} service=${services[index]}; done		# label each node for a specific service
 
