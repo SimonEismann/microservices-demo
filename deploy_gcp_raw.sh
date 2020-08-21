@@ -8,7 +8,7 @@ services=(adservice cartservice checkoutservice currencyservice emailservice fro
 # gcloud services enable container.googleapis.com
 # gcloud container clusters create $CLUSTER_NAME --enable-autoupgrade --enable-autoscaling --min-nodes=3 --max-nodes=10 --num-nodes=5 --zone $ZONE
 
-gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --max-pods-per-node=2 --machine-type=${MACHINE_TYPE}
+gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE}
 
 nodes=(kubectl get nodes | grep -vP '^NAME' | grep -oP '^[\w\-0-9]+')
 
