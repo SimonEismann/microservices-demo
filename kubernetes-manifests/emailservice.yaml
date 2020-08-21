@@ -63,6 +63,8 @@ spec:
             cpu: 100m
             memory: 64Mi
       serviceAccountName: emailservice
+      nodeSelector:
+        service: emailservice
 ---
 apiVersion: v1
 kind: Service

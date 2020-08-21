@@ -61,6 +61,8 @@ spec:
             cpu: 100m
             memory: 64Mi
       serviceAccountName: adservice
+      nodeSelector:
+        service: adservice
 ---
 apiVersion: v1
 kind: Service

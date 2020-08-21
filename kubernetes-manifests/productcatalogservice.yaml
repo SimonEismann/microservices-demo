@@ -65,6 +65,8 @@ spec:
             cpu: 100m
             memory: 64Mi
       serviceAccountName: productcatalogservice
+      nodeSelector:
+        service: prodcatservice
 ---
 apiVersion: v1
 kind: Service

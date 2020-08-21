@@ -35,6 +35,8 @@ spec:
         ports:
         - containerPort: 9411
       serviceAccountName: zipkin
+      nodeSelector:
+        service: zipkin
 ---
 apiVersion: v1
 kind: Service

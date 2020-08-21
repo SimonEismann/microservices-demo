@@ -61,6 +61,8 @@ spec:
             cpu: 100m
             memory: 64Mi
       serviceAccountName: paymentservice
+      nodeSelector:
+        service: paymentservice
 ---
 apiVersion: v1
 kind: Service
