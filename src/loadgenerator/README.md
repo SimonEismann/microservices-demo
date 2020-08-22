@@ -9,7 +9,7 @@ For more informations about the loadgenerator look [here](https://github.com/Sim
 # test your lua script for errors
 java -jar httpscripttester.jar ./example_load.lua
 
-# run loadgenerator
+# run loadgenerator (with load.csv and load.lua present in root folder)
 ./run.sh ${WARMUP_DURATION} ${WARMUP_RATE} ${WARMUP_PAUSE}
 # example: ./run.sh 60 3 5
 ```
