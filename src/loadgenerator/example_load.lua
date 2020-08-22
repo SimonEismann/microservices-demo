@@ -5,6 +5,7 @@ quantities = {1,2,3,4,5,10}
 avgCartItems = 6	--the average amount of cart items to add before cart_empty/checkout
 
 --define functions for all API calls
+--HTTP POST calls format: [POST](optional authentification_payload){optional payload}url
 function frontend_home()
 	return frontendIP.."/"
 end
@@ -14,11 +15,11 @@ function frontend_cart_view()
 end
 
 function frontend_cart_add(product_id, quantity)
-	return "[POST]"..frontend_cart_view().."/?product_id="..product_id.."&quantity="..quantity
+	return "[POST]{'product_id': "..product_id..",'quantity': "..quantity.."}"..frontend_cart_view()
 end
 
 function frontend_set_currency(currency_code)
-	return "[POST]"..frontendIP.."/setCurrency/?currency_code="..currency_code
+	return "[POST]{'currency_code': "..currency_code.."}"..frontendIP.."/setCurrency"
 end
 
 function frontend_product_browse(product_id)
@@ -26,7 +27,7 @@ function frontend_product_browse(product_id)
 end
 
 function frontend_cart_checkout()
-	return "[POST]"..frontend_cart_view().."/checkout/?email=someone%40example.com&street_address=1600+Amphitheatre+Parkway&zip_code=94043&city=Mountain+View&state=CA&country=United+States&credit_card_number=4432-8015-6152-0454&credit_card_expiration_month=1&credit_card_expiration_year=2039&credit_card_cvv=672"
+	return "[POST]{'email': 'someone@example.com','street_address': '1600 Amphitheatre Parkway','zip_code': '94043','city': 'Mountain View','state': 'CA','country': 'United States','credit_card_number': '4432-8015-6152-0454','credit_card_expiration_month': '1','credit_card_expiration_year': '2039','credit_card_cvv': '672'}"..frontend_cart_view().."/checkout"
 end
 
 function frontend_cart_empty()
