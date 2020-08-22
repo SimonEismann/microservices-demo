@@ -13,4 +13,4 @@ COPY run.sh run.sh
 
 RUN chmod +x ./run.sh
 
-ENTRYPOINT ["./run.sh", "60", "5", "10"]
+ENTRYPOINT ["/usr/local/loadgen/run.sh", "60", "5", "10"]

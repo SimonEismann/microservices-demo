@@ -2,9 +2,9 @@
 This repo is a fork of Tetrate's modified version of the GCP Hipstershop/Online Boutique with modifications to allow for in-depth Zipkin tracing. Changes include:
 - Native 100% tracing of every service with Zipkin with respect to parent and child spans.
 - Deployment with pre-built Zipkin and MySQL instances to allow for fast data generation and extraction.
-- Rewrite of `adservice`, `cartservice`, `currencyservice` and `paymentservice` in Go.
+- Rewrite of `adservice`, `cartservice`, `currencyservice` and `paymentservice` in Go. Usage of another [loadgenerator](https://github.com/SimonEismann/HTTP-Load-Generator).
 - Lots of smaller fixes.
-- Ready to use deployment (with and without Istio) and data extraction scripts.
+- Ready to use deployment (with and without Istio) and data extraction scripts. All services are deployed to separate nodes.
 - Artificial delays (constant workload) with matrix multiplication for all microservices.
 
 # Overview

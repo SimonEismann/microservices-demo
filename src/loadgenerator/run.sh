@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # start the actual loadgenerator
 nohup java -jar httploadgenerator.jar loadgenerator > /dev/null 2>&1 &
 # start the loadgen director with a specified .lua load script. wd=warmup duration (seconds), wp=warmup pause (after duration, seconds), wr=warmup rate (requests per second)
