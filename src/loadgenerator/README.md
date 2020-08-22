@@ -10,6 +10,5 @@ For more informations about the loadgenerator look [here](https://github.com/Sim
 java -jar httpscripttester.jar ./example_load.lua
 
 # run loadgenerator (with load.csv and load.lua present in root folder)
-./run.sh ${WARMUP_DURATION} ${WARMUP_RATE} ${WARMUP_PAUSE}
-# example: ./run.sh 60 3 5
+./run.sh
 ```
