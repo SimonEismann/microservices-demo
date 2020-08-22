@@ -54,6 +54,8 @@ spec:
         - mountPath: /data
           name: redis-data
       serviceAccountName: redis-cart
+      nodeSelector:
+        service: cartservice
       volumes:
       - emptyDir: {}
         name: redis-data

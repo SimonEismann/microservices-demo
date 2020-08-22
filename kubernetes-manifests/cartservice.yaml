@@ -65,6 +65,8 @@ spec:
             cpu: 100m
             memory: 64Mi
       serviceAccountName: cartservice
+      nodeSelector:
+        service: cartservice
 ---
 apiVersion: v1
 kind: Service

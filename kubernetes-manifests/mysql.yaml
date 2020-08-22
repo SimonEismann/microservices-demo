@@ -31,6 +31,8 @@ spec:
         ports:
         - containerPort: 3306
       serviceAccountName: mysql
+      nodeSelector:
+        service: zipkin
 ---
 apiVersion: v1
 kind: Service

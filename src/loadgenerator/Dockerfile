@@ -1,21 +1,19 @@
-FROM python:3-slim as base
+FROM openjdk:8-jdk-alpine
 
-FROM base as builder
+ARG LUA_FILE=example_load.lua
+ARG LOAD_FILE=example_load.csv
+ARG WARMUP_DURATION="60"	# seconds
+ARG WARMUP_RATE="5"			# requests per second
+ARG WARMUP_PAUSE="10"		# seconds
 
-RUN apt-get -qq update \
-    && apt-get install -y --no-install-recommends \
-        g++
+WORKDIR /usr/local/loadgen
 
-COPY requirements.txt .
+COPY ${LUA_FILE} load.lua
+COPY httploadgenerator.jar httploadgenerator.jar
+COPY ${LOAD_FILE} load.csv
+COPY load.jar load.jar
+COPY run.sh run.sh
 
-RUN pip install --prefix="/install" -r requirements.txt
+RUN chmod +x ./run.sh
 
-FROM base
-COPY --from=builder /install /usr/local
-
-COPY . .
-RUN chmod +x ./loadgen.sh
-RUN apt-get -qq update \
-    && apt-get install -y --no-install-recommends \
-        curl
-ENTRYPOINT ./loadgen.sh
+ENTRYPOINT ["./run.sh", ${WARMUP_DURATION}, ${WARMUP_RATE}, ${WARMUP_PAUSE}]

@@ -73,6 +73,8 @@ spec:
             cpu: 100m
             memory: 64Mi
       serviceAccountName: checkoutservice
+      nodeSelector:
+        service: checkoutservice
 ---
 apiVersion: v1
 kind: Service
