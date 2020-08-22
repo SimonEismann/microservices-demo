@@ -2,9 +2,9 @@ FROM openjdk:8-jdk-alpine
 
 ARG LUA_FILE=example_load.lua
 ARG LOAD_FILE=example_load.csv
-ARG WARMUP_DURATION=60	# seconds
-ARG WARMUP_RATE=5		# requests per second
-ARG WARMUP_PAUSE=10		# seconds
+ARG WARMUP_DURATION=60
+ARG WARMUP_RATE=5
+ARG WARMUP_PAUSE=10
 
 WORKDIR /usr/local/loadgen
 
