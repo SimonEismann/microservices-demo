@@ -76,7 +76,7 @@ Install a MySQL client:
 ```shell
 sudo apt-get install mariadb-client
 ```
-Then create a shell script, which takes the hostname (or IP) as a parameter:
+Then create a shell script, which takes the hostname (or IP) of the mysql host as a parameter:
 ```shell
 HOST=$1
 mkdir dump

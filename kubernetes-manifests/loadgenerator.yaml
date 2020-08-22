@@ -28,19 +28,19 @@ spec:
         version: v1
     spec:
       containers:
-        image: simoneismann/loadgenerator:master
-        imagePullPolicy: Always
-        name: loadgenerator
-        ports:
-        - containerPort: 8089
-          name: http
-        resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
-          requests:
-            cpu: 300m
-            memory: 256Mi
+        - name: loadgenerator
+          image: simoneismann/loadgenerator:master
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8089
+            name: http
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 300m
+              memory: 256Mi
       serviceAccountName: loadgenerator
       nodeSelector:
         service: loadgenerator
