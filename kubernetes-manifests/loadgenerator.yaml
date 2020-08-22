@@ -28,15 +28,6 @@ spec:
         version: v1
     spec:
       containers:
-      - env:
-        - name: FRONTEND_ADDR
-          value: http://frontend:8080
-        - name: PYTHONWARNINGS
-          value: ignore
-        - name: USERS
-          value: "10"
-        - name: ZIPKIN_SERVICE_ADDR
-          value: zipkin:9411
         image: simoneismann/loadgenerator:master
         imagePullPolicy: Always
         name: loadgenerator
@@ -51,6 +42,8 @@ spec:
             cpu: 300m
             memory: 256Mi
       serviceAccountName: loadgenerator
+      nodeSelector:
+        service: loadgenerator
 ---
 apiVersion: v1
 kind: ServiceAccount
