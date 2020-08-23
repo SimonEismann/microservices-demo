@@ -2,16 +2,19 @@ function getNewID()
 	return tostring(math.random(1000000000, 9999999999))
 end
 
-frontendIP = "http://frontend:8080"
-products = {"0PUK6V6EV0", "1YMWWN1N4O", "2ZYFJ3GM2N", "66VCHSJNUP", "6E92ZMYYFZ", "9SIQT8TOJO", "L9ECAV7KIM", "LS4PSXUNUM", "OLJCESPC7Z"}
-currencies = {"USD", "EUR", "CAD", "JPY", "GBP", "TRY"}		--same as whitelisted in frontend
-quantities = {1,2,3,4,5,10}
+function onCycle()	--define actions for each cycle (e.g., new user token, etc.)
+	userId = getNewID()
+	frontendIP = "http://frontend:8080"
+	products = {"0PUK6V6EV0", "1YMWWN1N4O", "2ZYFJ3GM2N", "66VCHSJNUP", "6E92ZMYYFZ", "9SIQT8TOJO", "L9ECAV7KIM", "LS4PSXUNUM", "OLJCESPC7Z"}
+	currencies = {"USD", "EUR", "CAD", "JPY", "GBP", "TRY"}		--same as whitelisted in frontend
+	quantities = {1,2,3,4,5,10}
 
-userId = getNewID()
-
---user behavior
-amountProductBrowse = 10
-amountCartAdd = 10
+	--user behavior
+	amountProductBrowse = 10
+	amountCartAdd = 10
+	
+	index = 0
+end
 
 --define functions for all API calls
 --HTTP POST calls format: [POST](optional authentification_payload){optional payload}url
@@ -48,28 +51,27 @@ function frontend_logout()
 end
 --end API call definitions
 
-function onCycle()	--define actions for each cycle (e.g., new user token, etc.)
-	userId = getNewID()
-end
-
 function onCall(callnum)
-	if (callnum == 1) then
+	index = index + 1
+	if (index == 1) then
 		return frontend_home()
-	elseif (callnum <= (1 + amountProductBrowse)) then
+	elseif (index <= (1 + amountProductBrowse)) then
 		return frontend_product_browse(products[math.random(#products)])
-	elseif (callnum == (2 + amountProductBrowse)) then
+	elseif (index == (2 + amountProductBrowse)) then
 		return frontend_set_currency(currencies[math.random(#currencies)])
-	elseif (callnum <= (2 + amountProductBrowse + amountCartAdd)) then
+	elseif (index <= (2 + amountProductBrowse + amountCartAdd)) then
 		return frontend_cart_add(userId, products[math.random(#products)], quantities[math.random(#quantities)])
-	elseif (callnum == (3 + amountProductBrowse + amountCartAdd)) then
+	elseif (index == (3 + amountProductBrowse + amountCartAdd)) then
 		return frontend_cart_view()
-	elseif (callnum == (4 + amountProductBrowse + amountCartAdd)) then
+	elseif (index == (4 + amountProductBrowse + amountCartAdd)) then
 		temp = math.random(3)
 		if (temp ~= 1) then
 			return frontend_cart_checkout(userId)
 		else
 			return frontend_cart_empty(userId)
 		end
+	elseif (index == (5 + amountProductBrowse + amountCartAdd)) then
+		return frontend_logout()
 	else
 		return nil;		--start a new cycle
 	end
