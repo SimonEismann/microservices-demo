@@ -54,7 +54,7 @@ end
 function onCall(callnum)
 	index = index + 1
 	if (index == 1) then
-		return frontend_home()
+		return frontend_cart_view() --frontend_home()
 	elseif (index <= (1 + amountProductBrowse)) then
 		return frontend_product_browse(products[math.random(#products)])
 	elseif (index == (2 + amountProductBrowse)) then
