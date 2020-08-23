@@ -454,6 +454,10 @@ func currentCurrency(r *http.Request) string {
 }
 
 func sessionID(r *http.Request) string {
+	userID := r.FormValue("user_id")
+	if userID != "" {
+		return userID
+	}
 	v := r.Context().Value(ctxKeySessionID{})
 	if v != nil {
 		return v.(string)
