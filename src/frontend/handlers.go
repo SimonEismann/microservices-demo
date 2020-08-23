@@ -212,17 +212,21 @@ func (fe *frontendServer) viewCartHandler(w http.ResponseWriter, r *http.Request
 	log := r.Context().Value(ctxKeyLog{}).(logrus.FieldLogger)
 	log.Debug("view user cart")
 	currencies, err := fe.getCurrencies(r.Context())
+	userID := mux.Vars(r)["id"]  // retrieve a user_id if available
+	if userID == "" {
+		userID = sessionID(r)
+	}
 	if err != nil {
 		renderHTTPError(log, r, w, errors.Wrap(err, "could not retrieve currencies"), http.StatusInternalServerError)
 		return
 	}
-	cart, err := fe.getCart(r.Context(), sessionID(r))
+	cart, err := fe.getCart(r.Context(), userID)
 	if err != nil {
 		renderHTTPError(log, r, w, errors.Wrap(err, "could not retrieve cart"), http.StatusInternalServerError)
 		return
 	}
 
-	recommendations, err := fe.getRecommendations(r.Context(), sessionID(r), cartIDs(cart))
+	recommendations, err := fe.getRecommendations(r.Context(), userID, cartIDs(cart))
 	if err != nil {
 		renderHTTPError(log, r, w, errors.Wrap(err, "failed to get product recommendations"), http.StatusInternalServerError)
 		return

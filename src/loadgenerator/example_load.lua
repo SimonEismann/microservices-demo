@@ -22,16 +22,16 @@ function frontend_home()
 	return frontendIP.."/"
 end
 
-function frontend_cart_view()
-	return frontendIP.."/cart"
+function frontend_cart_view(user_id)
+	return frontendIP.."/cart/"..user_id
 end
 
 function frontend_cart_add(user_id, product_id, quantity)
-	return "[POST]{'user_id': '"..user_id.."','product_id': '"..product_id.."','quantity': '"..quantity.."'}"..frontend_cart_view()
+	return "[POST]{\"user_id\":\""..user_id.."\", \"product_id\":\""..product_id.."\", \"quantity\":\""..quantity.."\"}"..frontend_cart_view()
 end
 
 function frontend_set_currency(currency_code)
-	return "[POST]{'currency_code': '"..currency_code.."'}"..frontendIP.."/setCurrency"
+	return "[POST]{\"currency_code\":\""..currency_code.."\"}"..frontendIP.."/setCurrency"
 end
 
 function frontend_product_browse(product_id)
@@ -39,15 +39,15 @@ function frontend_product_browse(product_id)
 end
 
 function frontend_cart_checkout(user_id)
-	return "[POST]{'user_id': '"..user_id.."','email': 'someone@example.com','street_address': '1600 Amphitheatre Parkway','zip_code': '94043','city': 'Mountain View','state': 'CA','country': 'United States','credit_card_number': '4432-8015-6152-0454','credit_card_expiration_month': '1','credit_card_expiration_year': '2039','credit_card_cvv': '672'}"..frontend_cart_view().."/checkout"
+	return "[POST]{\"user_id\":\""..user_id.."\", \"email\":\"someone@example.com\", \"street_address\":\"1600 Amphitheatre Parkway\", \"zip_code\":\"94043\", \"city\":\"Mountain View\", \"state\":\"CA\", \"country\":\"United States\", \"credit_card_number\":\"4432-8015-6152-0454\", \"credit_card_expiration_month\":\"1\", \"credit_card_expiration_year\":\"2039\", \"credit_card_cvv\":\"672\"}"..frontend_cart_view().."/checkout"
 end
 
 function frontend_cart_empty(user_id)
-	return "[POST]{'user_id': '"..user_id.."'}"..frontend_cart_view().."/empty"
+	return "[POST]{\"user_id\":\""..user_id.."\"}"..frontend_cart_view().."/empty"
 end
 
 function frontend_logout()
-	return "[POST]"..frontendIP.."/logout"
+	return frontendIP.."/logout"
 end
 --end API call definitions
 
@@ -62,7 +62,7 @@ function onCall(callnum)
 	elseif (index <= (2 + amountProductBrowse + amountCartAdd)) then
 		return frontend_cart_add(userId, products[math.random(#products)], quantities[math.random(#quantities)])
 	elseif (index == (3 + amountProductBrowse + amountCartAdd)) then
-		return frontend_cart_view()
+		return frontend_cart_view(userId)
 	elseif (index == (4 + amountProductBrowse + amountCartAdd)) then
 		temp = math.random(3)
 		if (temp ~= 1) then
