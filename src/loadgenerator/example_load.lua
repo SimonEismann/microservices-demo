@@ -53,24 +53,24 @@ function onCycle()	--define actions for each cycle (e.g., new user token, etc.)
 end
 
 function onCall(callnum)
-	if callnum == 1 then
+	if (callnum == 1) then
 		return frontend_home()
-	elseif callnum <= 1 + amountProductBrowse then
+	elseif (callnum <= (1 + amountProductBrowse)) then
 		return frontend_product_browse(products[math.random(#products)])
-	elseif callnum == 2 + amountProductBrowse then
+	elseif (callnum == (2 + amountProductBrowse)) then
 		return frontend_set_currency(currencies[math.random(#currencies)])
-	elseif callnum <= 2 + amountProductBrowse + amountCartAdd then
+	elseif (callnum <= (2 + amountProductBrowse + amountCartAdd)) then
 		return frontend_cart_add(userId, products[math.random(#products)], quantities[math.random(#quantities)])
-	elseif callnum == 3 + amountProductBrowse + amountCartAdd then
+	elseif (callnum == (3 + amountProductBrowse + amountCartAdd)) then
 		return frontend_cart_view()
-	elseif callnum == 4 + amountProductBrowse + amountCartAdd then
+	elseif (callnum == (4 + amountProductBrowse + amountCartAdd)) then
 		temp = math.random(3)
-		if temp ~= 1 then
+		if (temp ~= 1) then
 			return frontend_cart_checkout(userId)
 		else
 			return frontend_cart_empty(userId)
 		end
 	else
-		return nil		--start a new cycle
+		return nil;		--start a new cycle
 	end
 end
