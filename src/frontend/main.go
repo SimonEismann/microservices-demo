@@ -72,6 +72,7 @@ var (
 	delayCartEmpty		  = flag.Int64("DELAY_CART_EMPTY", 0, "Additional delay when deleting cart (default: 0)")
 	delayCheckout		  = flag.Int64("DELAY_CHECKOUT", 0, "Additional delay when checking out the cart (default: 0)")
 	delaySetCurr		  = flag.Int64("DELAY_SET_CURRENCY", 0, "Additional delay when setting currency (default: 0)")
+	delayLogout		  	  = flag.Int64("DELAY_LOGOUT", 0, "Additional delay when calling /logout (default: 0)")
 
 	whitelistedCurrencies = map[string]bool{
 		"USD": true,
@@ -113,6 +114,7 @@ type frontendServer struct {
 	delayCartEmpty	int64
 	delayCheckout	int64
 	delaySetCurr	int64
+	delayLogout		int64
 }
 
 func main() {
@@ -159,6 +161,7 @@ func main() {
 		delayCartEmpty:		   *delayCartEmpty,
 		delayCheckout:		   *delayCheckout,
 		delaySetCurr:		   *delaySetCurr,
+		delayLogout:		   *delayLogout,
 	}
 
 	mustConnGRPC(ctx, &svc.currencySvcConn, svc.currencySvcAddr)

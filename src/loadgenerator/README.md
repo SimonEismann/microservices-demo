@@ -1,6 +1,6 @@
 A load profile can be configured in `example_load.csv` -> Format: "passed_time,request_amount_to_send".
 
-`example_load.lua` defines the behavior of the Loadgenerator.
+`example_load.lua` defines the behavior of the Loadgenerator. We deploy the loadgenerator with only 1 thread so the example behavior is not executed multiple times at once. Therefore, the behavior of the example behavior can be observed better.
 
 The result log of the Loadgenerator appears in the root folder as `result.csv`.
 

@@ -61,6 +61,8 @@ spec:
           value: "0"
         - name: DELAY_SET_CURRENCY
           value: "0"
+        - name: DELAY_LOGOUT
+          value: "0"
         image: simoneismann/frontend:master
         imagePullPolicy: Always
         livenessProbe:
