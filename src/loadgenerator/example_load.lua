@@ -25,7 +25,7 @@ function frontend_cart_view(user_id)
 end
 
 function frontend_cart_add(user_id, product_id, quantity)
-	return "[POST]{product_id="..product_id.."&quantity="..quantity.."}"..frontendIP.."/cart"
+	return "[POST]{user_id="..user_id.."&product_id="..product_id.."&quantity="..quantity.."}"..frontendIP.."/cart"
 end
 
 function frontend_set_currency(currency_code)
