@@ -4,7 +4,7 @@ end
 
 function onCycle()	--define actions for each cycle (e.g., new user token, etc.)
 	userId = getNewID()
-	frontendIP = "http://34.121.148.219:8080"  --"http://frontend:8080"
+	frontendIP = "http://frontend:8080"
 	products = {"0PUK6V6EV0", "1YMWWN1N4O", "2ZYFJ3GM2N", "66VCHSJNUP", "6E92ZMYYFZ", "9SIQT8TOJO", "L9ECAV7KIM", "LS4PSXUNUM", "OLJCESPC7Z"}
 	currencies = {"USD", "EUR", "CAD", "JPY", "GBP", "TRY"}		--same as whitelisted in frontend
 	quantities = {1,2,3,4,5,10}

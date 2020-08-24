@@ -5,6 +5,8 @@ A load profile can be configured in `example_load.csv` -> Format: "passed_time,r
 The result log of the Loadgenerator appears in the root folder as `result.csv`.
 
 For more informations about the loadgenerator look [here](https://github.com/SimonEismann/HTTP-Load-Generator).
+
+We use an adapted version which supports `application/x-www-form-urlencoded` HTTP content-type for POST requests.
 ```shell
 # test your lua script for errors
 java -jar httpscripttester.jar ./example_load.lua
