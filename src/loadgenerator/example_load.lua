@@ -37,7 +37,7 @@ function frontend_product_browse(product_id)
 end
 
 function frontend_cart_checkout(user_id)
-	return "[POST]{user_id="..user_id.."&email=someone%40example.com&street_address=1600+Amphitheatre+Parkway&zip_code=94043&city=Mountain+View&state=CA&country=United+States&credit_card_number=4432-8015-6152-0454&credit_card_expiration_month=1&credit_card_expiration_year=2021&credit_card_cvv=672}"..frontend_cart_view().."/checkout"
+	return "[POST]{user_id="..user_id.."&email=someone%40example.com&street_address=1600+Amphitheatre+Parkway&zip_code=94043&city=Mountain+View&state=CA&country=United+States&credit_card_number=4432-8015-6152-0454&credit_card_expiration_month=1&credit_card_expiration_year=2021&credit_card_cvv=672}"..frontendIP.."/cart/checkout"
 end
 
 function frontend_cart_empty(user_id)
