@@ -1,0 +1,41 @@
+// Prepares an individual data point
+/*dataPoint := &monitoringpb.Point{
+    Interval: &monitoringpb.TimeInterval{
+        EndTime: &googlepb.Timestamp{
+            Seconds: time.Now().Unix(),
+        },
+    },
+    Value: &monitoringpb.TypedValue{
+        Value: &monitoringpb.TypedValue_DoubleValue{
+            DoubleValue: 123.45,
+        },
+    },
+}*/
+
+// Writes time series data.
+/*if err := client.CreateTimeSeries(ctx, &monitoringpb.CreateTimeSeriesRequest{
+    Name: monitoring.MetricProjectPath(projectID),
+    TimeSeries: []*monitoringpb.TimeSeries{
+        {
+            Metric: &metricpb.Metric{
+                Type: "custom.googleapis.com/stores/daily_sales",
+                Labels: map[string]string{
+                    "store_id": "Pittsburg",
+                },
+            },
+            Resource: &monitoredrespb.MonitoredResource{
+                Type: "global",
+                Labels: map[string]string{
+                    "project_id": projectID,
+                },
+            },
+            Points: []*monitoringpb.Point{
+                dataPoint,
+            },
+        },
+    },
+}); err != nil {
+    log.Fatalf("Failed to write time series data: %v", err)
+}
+
+fmt.Printf("Done writing time series data.\n")*/
