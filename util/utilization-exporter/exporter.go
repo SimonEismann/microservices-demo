@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"google.golang.org/api/iterator"
 	"log"
 	"os"
 	"strconv"
@@ -46,12 +45,13 @@ func main() {
 
 	for true {
 		timeseries, isDone := ts.Next()
-		if isDone == iterator.Done {
+		if isDone != nil {
 			break
 		}
 		fmt.Printf("Timeseries: %s", timeseries.String())
-		for point := range timeseries.Points {
-			fmt.Print(point)
+		points := timeseries.Points
+		for i := 0; i < len(points); i++  {
+			fmt.Printf("%s --> %s", points[i].Interval.String(), points[i].Value.String())
 		}
 	}
 }
