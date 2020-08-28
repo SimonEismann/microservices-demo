@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"google.golang.org/api/iterator"
 	"log"
 	"os"
 	"strconv"
@@ -9,7 +11,6 @@ import (
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	googlepb "github.com/golang/protobuf/ptypes/timestamp"
-	"golang.org/x/net/context"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 )
 
@@ -32,7 +33,7 @@ func main() {
 
 	ts := client.ListTimeSeries(ctx, &monitoringpb.ListTimeSeriesRequest{
 		Name:        "projects/" + projectID,
-		Filter:      "metric.type = compute.googleapis.com/instance/cpu/utilization",
+		Filter:      "metric.type = \"compute.googleapis.com/instance/cpu/utilization\"",
 		Interval:    &monitoringpb.TimeInterval{
 			EndTime:   &googlepb.Timestamp{
 				Seconds: endTime,
@@ -45,8 +46,11 @@ func main() {
 
 	for true {
 		timeseries, isDone := ts.Next()
-		if isDone != nil {
+		if isDone == iterator.Done {
 			break
+		}
+		if err != nil {
+			log.Fatal(err)
 		}
 		fmt.Printf("Timeseries: %s", timeseries.String())
 		points := timeseries.Points
