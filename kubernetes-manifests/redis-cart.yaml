@@ -78,7 +78,7 @@ spec:
   selector:
     app: redis-cart
     project: hipstershopistio
-  type: ClusterIP
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: ServiceAccount
