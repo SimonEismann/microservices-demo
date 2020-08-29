@@ -8,7 +8,6 @@ WORKDIR /usr/local/loadgen
 COPY ${LUA_FILE} load.lua
 COPY httploadgenerator.jar httploadgenerator.jar
 COPY ${LOAD_FILE} load.csv
-COPY load.jar load.jar
 COPY run.sh run.sh
 COPY userids.txt userids.txt
 
