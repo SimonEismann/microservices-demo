@@ -1,9 +1,5 @@
-function getNewID()
-	return tostring(math.random(1000000000, 9999999999))
-end
-
-function onCycle()	--define actions for each cycle (e.g., new user token, etc.)
-	userId = getNewID()
+function onCycle(id_new_user)	--define actions for each cycle (e.g., new user token, etc.)
+	userId = id_new_user
 	frontendIP = "http://frontend:8080"
 	products = {"0PUK6V6EV0", "1YMWWN1N4O", "2ZYFJ3GM2N", "66VCHSJNUP", "6E92ZMYYFZ", "9SIQT8TOJO", "L9ECAV7KIM", "LS4PSXUNUM", "OLJCESPC7Z"}
 	currencies = {"USD", "EUR", "CAD", "JPY", "GBP", "TRY"}		--same as whitelisted in frontend

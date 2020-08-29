@@ -10,6 +10,7 @@ COPY httploadgenerator.jar httploadgenerator.jar
 COPY ${LOAD_FILE} load.csv
 COPY load.jar load.jar
 COPY run.sh run.sh
+COPY userids.txt userids.txt
 
 RUN chmod +x ./run.sh
 

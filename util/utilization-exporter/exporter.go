@@ -52,10 +52,10 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("Timeseries: %s", timeseries.String())
+		fmt.Printf("Timeseries: %s\n", timeseries.String())
 		points := timeseries.Points
 		for i := 0; i < len(points); i++  {
-			fmt.Printf("%s --> %s", points[i].Interval.String(), points[i].Value.String())
+			fmt.Printf("Point: %s --> %s\n", points[i].Interval.String(), points[i].Value.String())
 		}
 	}
 }

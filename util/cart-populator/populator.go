@@ -41,7 +41,7 @@ var (
 )
 
 const (
-	START_INDEX int64 = 1000000000
+	START_INDEX int64 = 100000000
 	QUANTITY int32 = 5
 )
 
