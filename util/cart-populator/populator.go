@@ -68,6 +68,8 @@ func main() {
 		err := client.Set(context.Background(), strconv.Itoa(int(i)), *cartItemsToString(&items), 0).Err()
 		if err != nil {
 			fmt.Println(err)
+		} else {
+			fmt.Printf("%d/%d carts added\n", i - START_INDEX + 1, cartAmount)
 		}
 	}
 	err = client.Close()
