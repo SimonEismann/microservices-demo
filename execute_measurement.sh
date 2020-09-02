@@ -15,7 +15,7 @@ LOAD_RESULT="loadgen_result.csv"
 
 chmod +x deploy_gcp_raw.sh
 ./deploy_gcp_raw.sh
-echo "waiting for system to boot up..."
+echo "waiting for system to boot up... (3 minutes)"
 sleep 180
 REDIS_ADDR="$(kubectl -n default get service redis-cart -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):6379"
 FRONTEND_ADDR="$(kubectl -n default get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):8080"
@@ -24,12 +24,14 @@ go run util/cart-populator/populator.go $REDIS_ADDR $USER_AMOUNT $ITEMS_PER_CART
 echo "generate config files for loadgenerator..."
 # generate user id file
 rm -f $USER_ID_FILE
+touch $USER_ID_FILE
 for ((n=100000000;n<$(($USER_AMOUNT + 100000000));n++))
 do
 	printf "$n\n" >> $USER_ID_FILE
 done
 # generate load.csv
 rm -f $LOAD
+touch $USER_ID_FILE
 for ((n=1;n<=$LOAD_DURATION;n++))
 do
 	timestamp=$((n - 1)).5
