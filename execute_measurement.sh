@@ -4,7 +4,7 @@ LOAD_INTENSITY=5	# requests per second
 EXPERIMENT_NAME="experiments/test"	# acts as the directory path to store related files to
 THREADS=1
 
-mkdir EXPERIMENT_NAME
+mkdir $EXPERIMENT_NAME
 
 USER_AMOUNT=$(($LOAD_DURATION * $LOAD_INTENSITY))
 UTIL_FILE_PATH="${EXPERIMENT_NAME}/util_results.txt"
@@ -31,13 +31,15 @@ do
 done
 # generate load.csv
 rm -f $LOAD
-touch $USER_ID_FILE
+touch $LOAD
 for ((n=1;n<=$LOAD_DURATION;n++))
 do
 	timestamp=$((n - 1)).5
 	printf "$timestamp,$LOAD_INTENSITY\n" >> $LOAD
 done
 # checkout only lua script
+rm -f $LOAD_SCRIPT
+touch $LOAD_SCRIPT
 printf "frontendIP = ${FRONTEND_ADDR}\nfunction onCycle(id_new_user)\n\tuserId = id_new_user\nend\nfunction frontend_cart_checkout(user_id)\n\treturn \"[POST]{user_id=\"..user_id..\"&email=someone%40example.com&street_address=1600+Amphitheatre+Parkway&zip_code=94043&city=Mountain+View&state=CA&country=United+States&credit_card_number=4432-8015-6152-0454&credit_card_expiration_month=1&credit_card_expiration_year=2021&credit_card_cvv=672}\"..frontendIP..\"/cart/checkout\"\nend\nfunction onCall(callnum)\n\tif (callnum == 1) then\n\t\treturn frontend_cart_checkout(userId)\n\telse\n\t\treturn nil\n\tend\nend" > $LOAD_SCRIPT
 echo "starting load generator..."
 java -jar src/loadgenerator/httploadgenerator.jar loadgenerator --user-id-file $USER_ID_FILE & java -jar src/loadgenerator/httploadgenerator.jar director --ip localhost --load $LOAD -o $LOAD_RESULT --lua $LOAD_SCRIPT -t $THREADS
