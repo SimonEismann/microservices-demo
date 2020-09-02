@@ -4,7 +4,7 @@ LOAD_INTENSITY=5	# requests per second
 EXPERIMENT_NAME="experiments/test"	# acts as the directory path to store related files to
 THREADS=1
 
-mkdir $EXPERIMENT_NAME
+mkdir -p $EXPERIMENT_NAME
 
 USER_AMOUNT=$(($LOAD_DURATION * $LOAD_INTENSITY))
 UTIL_FILE_PATH="${EXPERIMENT_NAME}/util_results.txt"
