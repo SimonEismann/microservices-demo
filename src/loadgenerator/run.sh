@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # delay start to let system boot up
-sleep 120
+sleep 180
 # start the actual loadgenerator and the loadgen director with a specified .lua load script.
 java -jar httploadgenerator.jar loadgenerator --user-id-file userids.txt & java -jar httploadgenerator.jar director --ip localhost --load load.csv -o result.csv --lua load.lua -t 1
 cat result.csv

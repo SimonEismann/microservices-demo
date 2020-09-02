@@ -11,7 +11,7 @@ function onCycle(id_new_user)	--define actions for each cycle (e.g., new user to
 end
 
 --define functions for all API calls (normally GET)
---HTTP POST calls format: [POST](optional authentification_payload){optional payload}url
+--HTTP POST calls format: [POST](optional authentification_payload [brackets included in parsed payload]){optional payload [brackets NOT included in parsed payload]}url
 function frontend_home()
 	return frontendIP.."/"
 end
