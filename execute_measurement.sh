@@ -19,8 +19,10 @@ echo "waiting for system to boot up... (3 minutes)"
 sleep 180
 REDIS_ADDR="$(kubectl -n default get service redis-cart -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):6379"
 FRONTEND_ADDR="$(kubectl -n default get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):8080"
-echo "populating cart data base with ${CART_AMOUNT} carts..."
-go run util/cart-populator/populator.go $REDIS_ADDR $USER_AMOUNT $ITEMS_PER_CART
+echo "populating cart data base with ${USER_AMOUNT} carts..."
+cd util/cart-populator
+go run populator.go $REDIS_ADDR $USER_AMOUNT $ITEMS_PER_CART
+cd ../..
 echo "generate config files for loadgenerator..."
 # generate user id file
 rm -f $USER_ID_FILE
@@ -40,8 +42,10 @@ done
 # checkout only lua script
 rm -f $LOAD_SCRIPT
 touch $LOAD_SCRIPT
-printf "frontendIP = ${FRONTEND_ADDR}\nfunction onCycle(id_new_user)\n\tuserId = id_new_user\nend\nfunction frontend_cart_checkout(user_id)\n\treturn \"[POST]{user_id=\"..user_id..\"&email=someone%40example.com&street_address=1600+Amphitheatre+Parkway&zip_code=94043&city=Mountain+View&state=CA&country=United+States&credit_card_number=4432-8015-6152-0454&credit_card_expiration_month=1&credit_card_expiration_year=2021&credit_card_cvv=672}\"..frontendIP..\"/cart/checkout\"\nend\nfunction onCall(callnum)\n\tif (callnum == 1) then\n\t\treturn frontend_cart_checkout(userId)\n\telse\n\t\treturn nil\n\tend\nend" > $LOAD_SCRIPT
+printf "frontendIP = \"${FRONTEND_ADDR}\"\nfunction onCycle(id_new_user)\n\tuserId = id_new_user\nend\nfunction frontend_cart_checkout(user_id)\n\treturn \"[POST]{user_id=\"..user_id..\"&email=someone\%40example.com&street_address=1600+Amphitheatre+Parkway&zip_code=94043&city=Mountain+View&state=CA&country=United+States&credit_card_number=4432-8015-6152-0454&credit_card_expiration_month=1&credit_card_expiration_year=2021&credit_card_cvv=672}\"..frontendIP..\"/cart/checkout\"\nend\nfunction onCall(callnum)\n\tif (callnum == 1) then\n\t\treturn frontend_cart_checkout(userId)\n\telse\n\t\treturn nil\n\tend\nend" > $LOAD_SCRIPT
 echo "starting load generator..."
 java -jar src/loadgenerator/httploadgenerator.jar loadgenerator --user-id-file $USER_ID_FILE & java -jar src/loadgenerator/httploadgenerator.jar director --ip localhost --load $LOAD -o $LOAD_RESULT --lua $LOAD_SCRIPT -t $THREADS
 echo "saving stackdriver utilization logs to ${UTIL_FILE_PATH}"
-go run util/utilization-exporter/exporter.go `gcloud config get-value project` $(($LOAD_DURATION + 10)) > $UTIL_FILE_PATH
+cd util/utilization-exporter
+go run exporter.go `gcloud config get-value project` $(($LOAD_DURATION + 10)) > ../../$UTIL_FILE_PATH
+cd ../..
