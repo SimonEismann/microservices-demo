@@ -32,10 +32,10 @@ func main() {
 	startTime := endTime - interval
 
 	ts := client.ListTimeSeries(ctx, &monitoringpb.ListTimeSeriesRequest{
-		Name:        "projects/" + projectID,
-		Filter:      "metric.type = \"compute.googleapis.com/instance/cpu/utilization\"",
-		Interval:    &monitoringpb.TimeInterval{
-			EndTime:   &googlepb.Timestamp{
+		Name:   "projects/" + projectID,
+		Filter: "metric.type = \"compute.googleapis.com/instance/cpu/utilization\"",
+		Interval: &monitoringpb.TimeInterval{
+			EndTime: &googlepb.Timestamp{
 				Seconds: endTime,
 			},
 			StartTime: &googlepb.Timestamp{
@@ -54,8 +54,11 @@ func main() {
 		}
 		fmt.Printf("Timeseries: %s\n", timeseries.String())
 		points := timeseries.Points
+		avg_util := 0.0
 		for i := 0; i < len(points); i++  {
 			fmt.Printf("Point: %s --> %s\n", points[i].Interval.String(), points[i].Value.String())
+			avg_util += points[i].Value.GetDoubleValue()
 		}
+		fmt.Printf("Average Utilization: %f\n", avg_util / float64(len(points)))
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"math/rand"
 	"os"
 	"strconv"
 )
@@ -28,10 +29,10 @@ func connectToRedis(c context.Context) *redis.Client {
 		DB:       0,  // use default DB
 		MaxRetries: 5, // like in the c# implementation
 	})
-	_, err := rdb.Ping(c).Result()
+	/*_, err := rdb.Ping(c).Result()
 	if err != nil {
 		fmt.Println(err)
-	}
+	}*/
 	return rdb
 }
 
@@ -58,22 +59,26 @@ func main() {
 	}
 	client := connectToRedis(context.Background())
 	for i := START_INDEX; i < START_INDEX + cartAmount; i++ {
-		items := []*pb.CartItem{}
-		for j := 0; j < int(itemAmount); j++ {
-			items = append(items, &pb.CartItem{
-				ProductId: PRODUCTS[j % len(PRODUCTS)],
-				Quantity:  QUANTITY,
-			})
-		}
-		err := client.Set(context.Background(), strconv.Itoa(int(i)), *cartItemsToString(&items), 0).Err()
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Printf("%d/%d carts added\n", i - START_INDEX + 1, cartAmount)
-		}
+		go addCart(i, itemAmount, cartAmount, client)	// adds cart in new thread
 	}
 	err = client.Close()
 	if err != nil {
 		fmt.Print(err)
+	}
+}
+
+func addCart(cart_index int64, itemAmount int64, cartAmount int64, client *redis.Client) {
+	items := []*pb.CartItem{}
+	for j := 0; j < int(rand.NormFloat64() * float64(itemAmount) / 3 + float64(itemAmount)); j++ {		// normal distribution of itemAmount with with stddev=itemAmount/3
+		items = append(items, &pb.CartItem{
+			ProductId: PRODUCTS[j % len(PRODUCTS)],
+			Quantity:  QUANTITY,
+		})
+	}
+	err := client.Set(context.Background(), strconv.Itoa(int(cart_index)), *cartItemsToString(&items), 0).Err()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("cart %d of %d added\n", cart_index - START_INDEX + 1, cartAmount)
 	}
 }

@@ -1,8 +1,11 @@
-ITEMS_PER_CART=10	# TODO: as parameter
-LOAD_DURATION=300 	# in seconds
-LOAD_INTENSITY=5	# requests per second
-EXPERIMENT_NAME="experiments/test"	# acts as the directory path to store related files to
-THREADS=1
+# usage: 	./execute_measurement.sh $EXPERIMENT_NAME $THREADS $LOAD_DURATION $LOAD_INTENSITY $ITEMS_PER_CART
+# example: 	./execute_measurement.sh experiments/test 1 300 5 10
+
+EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
+THREADS=$2					# amount of loadgenerator threads to work in parallel
+LOAD_DURATION=$3 			# in seconds
+LOAD_INTENSITY=$4			# requests per second
+ITEMS_PER_CART=$5			# avg of a normal distribution
 
 mkdir -p $EXPERIMENT_NAME
 
