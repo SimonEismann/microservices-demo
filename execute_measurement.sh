@@ -1,11 +1,10 @@
-# usage: 	./execute_measurement.sh $EXPERIMENT_NAME $THREADS $LOAD_DURATION $LOAD_INTENSITY $ITEMS_PER_CART
-# example: 	./execute_measurement.sh experiments/test 1 300 5 10
+# usage: 	./execute_measurement.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY $ITEMS_PER_CART
+# example: 	./execute_measurement.sh experiments/test 300 5 10
 
 EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
-THREADS=$2					# amount of loadgenerator threads to work in parallel
-LOAD_DURATION=$3 			# in seconds
-LOAD_INTENSITY=$4			# requests per second
-ITEMS_PER_CART=$5			# avg of a normal distribution
+LOAD_DURATION=$2 			# in seconds
+LOAD_INTENSITY=$3			# requests per second
+ITEMS_PER_CART=$4			# avg of a normal distribution
 
 mkdir -p $EXPERIMENT_NAME
 
@@ -48,7 +47,7 @@ touch $LOAD_SCRIPT
 printf "frontendIP = \"http://${FRONTEND_ADDR}\"\nfunction onCycle(id_new_user)\n\tuserId = id_new_user\nend\nfunction frontend_cart_checkout(user_id)\n\treturn \"[POST]{user_id=\"..user_id..\"&email=someone%%40example.com&street_address=1600+Amphitheatre+Parkway&zip_code=94043&city=Mountain+View&state=CA&country=United+States&credit_card_number=4432-8015-6152-0454&credit_card_expiration_month=1&credit_card_expiration_year=2021&credit_card_cvv=672}\"..frontendIP..\"/cart/checkout\"\nend\nfunction onCall(callnum)\n\tif (callnum == 1) then\n\t\treturn frontend_cart_checkout(userId)\n\telse\n\t\treturn nil\n\tend\nend" > $LOAD_SCRIPT
 echo "starting load generator..."
 pkill -f 'java -jar'
-java -jar src/loadgenerator/httploadgenerator.jar loadgenerator --user-id-file $USER_ID_FILE & java -jar src/loadgenerator/httploadgenerator.jar director --ip localhost --load $LOAD -o $LOAD_RESULT --lua $LOAD_SCRIPT -t $THREADS
+java -jar src/loadgenerator/httploadgenerator.jar loadgenerator --user-id-file $USER_ID_FILE & java -jar src/loadgenerator/httploadgenerator.jar director --ip localhost --load $LOAD -o $LOAD_RESULT --lua $LOAD_SCRIPT -t $LOAD_INTENSITY
 pkill -f 'java -jar'
 echo "saving stackdriver utilization logs to ${UTIL_FILE_PATH}"
 cd util/utilization-exporter

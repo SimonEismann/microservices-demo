@@ -5,9 +5,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"math"
 	"math/rand"
 	"os"
 	"strconv"
+	"sync"
 )
 
 // convert cart content to csv
@@ -22,7 +24,7 @@ func cartItemsToString(items *[]*pb.CartItem) *string {
 	return &res
 }
 
-func connectToRedis(c context.Context) *redis.Client {
+func connectToRedis() *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     REDIS_ADDR,
 		Password: "", // no password set
@@ -39,11 +41,13 @@ func connectToRedis(c context.Context) *redis.Client {
 var (
 	PRODUCTS = [...]string{"0PUK6V6EV0", "1YMWWN1N4O", "2ZYFJ3GM2N", "66VCHSJNUP", "6E92ZMYYFZ", "9SIQT8TOJO", "L9ECAV7KIM", "LS4PSXUNUM", "OLJCESPC7Z"}
 	REDIS_ADDR string
+    wg sync.WaitGroup
 )
 
 const (
 	START_INDEX int64 = 100000000
 	QUANTITY int32 = 5
+	CARTS_PER_THREAD = 100.0
 )
 
 func main() {
@@ -57,28 +61,39 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	client := connectToRedis(context.Background())
-	for i := START_INDEX; i < START_INDEX + cartAmount; i++ {
-		go addCart(i, itemAmount, cartAmount, client)	// adds cart in new thread
+	threadAmount := int(math.Ceil(float64(cartAmount) / CARTS_PER_THREAD))
+	wg.Add(threadAmount)
+	for i := 0; i < threadAmount; i++ {
+		offset := int64(CARTS_PER_THREAD * i)
+		carts := int64(CARTS_PER_THREAD)
+		if i >= threadAmount - 1 {
+			carts = cartAmount % CARTS_PER_THREAD
+		}
+		go addCart(START_INDEX + offset, itemAmount, carts)	// adds cart in new thread
 	}
-	err = client.Close()
-	if err != nil {
-		fmt.Print(err)
-	}
+	wg.Wait()
 }
 
-func addCart(cart_index int64, itemAmount int64, cartAmount int64, client *redis.Client) {
-	items := []*pb.CartItem{}
-	for j := 0; j < int(rand.NormFloat64() * float64(itemAmount) / 3 + float64(itemAmount)); j++ {		// normal distribution of itemAmount with with stddev=itemAmount/3
-		items = append(items, &pb.CartItem{
-			ProductId: PRODUCTS[j % len(PRODUCTS)],
-			Quantity:  QUANTITY,
-		})
+func addCart(cart_index_start int64, itemAmount int64, cartAmount int64) {
+	defer wg.Done()
+	client := connectToRedis()
+	for i := cart_index_start; i < cart_index_start + cartAmount; i++ {
+		items := []*pb.CartItem{}
+		for j := 0; j < int(rand.NormFloat64() * float64(itemAmount) / 3 + float64(itemAmount)); j++ {		// normal distribution of itemAmount with with stddev=itemAmount/3
+			items = append(items, &pb.CartItem{
+				ProductId: PRODUCTS[j % len(PRODUCTS)],
+				Quantity:  QUANTITY,
+			})
+		}
+		err := client.Set(context.Background(), strconv.Itoa(int(i)), *cartItemsToString(&items), 0).Err()
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Printf("cart %d added\n", i)
+		}
 	}
-	err := client.Set(context.Background(), strconv.Itoa(int(cart_index)), *cartItemsToString(&items), 0).Err()
+	err := client.Close()
 	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Printf("cart %d of %d added\n", cart_index - START_INDEX + 1, cartAmount)
+		fmt.Print(err)
 	}
 }
