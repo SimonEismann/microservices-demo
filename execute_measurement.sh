@@ -53,3 +53,11 @@ echo "saving stackdriver utilization logs to ${UTIL_FILE_PATH}"
 cd util/utilization-exporter
 go run exporter.go `gcloud config get-value project` $(($LOAD_DURATION + 10)) > ../../$UTIL_FILE_PATH
 cd ../..
+echo "wait 2 minutes for zipkin data to settle..."
+sleep 120
+echo "save MySQL dump to csv..."
+MYSQL_ADDR="$(kubectl -n default get service mysql -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+for tb in $(mysql --protocol=tcp --host=${MYSQL_ADDR} -pzipkin -uzipkin zipkin -sN -e "SHOW TABLES;"); do
+    mysql -B --protocol=tcp --host=${MYSQL_ADDR} -pzipkin -uzipkin zipkin -e "SELECT * FROM ${tb};" | sed "s/\"/\"\"/g;s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" > ${EXPERIMENT_NAME}/${tb}.csv;
+done
+echo "finished measurement successfully! All data can be found in ${EXPERIMENT_NAME}."

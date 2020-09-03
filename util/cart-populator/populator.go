@@ -67,7 +67,7 @@ func main() {
 		offset := int64(CARTS_PER_THREAD * i)
 		carts := int64(CARTS_PER_THREAD)
 		if i >= threadAmount - 1 {
-			carts = cartAmount % CARTS_PER_THREAD
+			carts = cartAmount - offset
 		}
 		go addCart(START_INDEX + offset, itemAmount, carts)	// adds cart in new thread
 	}
