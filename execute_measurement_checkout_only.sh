@@ -1,10 +1,10 @@
 # usage: 	./execute_measurement.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY $ITEMS_PER_CART
-# example: 	./execute_measurement.sh experiments/test 300 5 10
+# example: 	./execute_measurement.sh experiments/checkout 300 5 10
 
 EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
 LOAD_DURATION=$2 			# in seconds
 LOAD_INTENSITY=$3			# requests per second
-ITEMS_PER_CART=$4			# avg of a normal distribution
+ITEMS_PER_CART=$4			# avg of a normal distribution, stddev=ITEMS_PER_CART/3
 
 mkdir -p $EXPERIMENT_NAME
 
@@ -15,6 +15,7 @@ LOAD="${EXPERIMENT_NAME}/load.csv"
 LOAD_SCRIPT="${EXPERIMENT_NAME}/load.lua"
 LOAD_RESULT="loadgen_result.csv"
 NODE_MAP="${EXPERIMENT_NAME}/nodemap.txt"
+OVERVIEW="${EXPERIMENT_NAME}/overview.txt"
 
 export PROJECT_ID=`gcloud config get-value project`
 export ZONE=us-central1-a
@@ -77,4 +78,5 @@ MYSQL_ADDR="$(kubectl -n default get service mysql -o jsonpath='{.status.loadBal
 for tb in $(mysql --protocol=tcp --host=${MYSQL_ADDR} -pzipkin -uzipkin zipkin -sN -e "SHOW TABLES;"); do
     mysql -B --protocol=tcp --host=${MYSQL_ADDR} -pzipkin -uzipkin zipkin -e "SELECT * FROM ${tb};" | sed "s/\"/\"\"/g;s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" > ${EXPERIMENT_NAME}/${tb}.csv;
 done
+python3 util/experiment_data_overview.py $EXPERIMENT_NAME > $OVERVIEW
 echo "finished measurement successfully! All data can be found in ${EXPERIMENT_NAME}."
