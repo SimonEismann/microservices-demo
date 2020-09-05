@@ -1,5 +1,5 @@
-# usage: 	./execute_measurement.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY $ITEMS_PER_CART
-# example: 	./execute_measurement.sh experiments/checkout 300 5 10
+# usage: 	./execute_measurement_checkout_only.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY $ITEMS_PER_CART
+# example: 	./execute_measurement_checkout_only.sh experiments/checkout 300 5 10
 
 EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
 LOAD_DURATION=$2 			# in seconds
@@ -22,7 +22,7 @@ export ZONE=us-central1-a
 export CLUSTER_NAME=${PROJECT_ID}-1
 export MACHINE_TYPE=n1-standard-1
 services=(adservice cartservice checkoutservice currencyservice emailservice frontend paymentservice prodcatservice recommservice shippingservice zipkin)
-gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE}
+gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE} --no-enable-autoupgrade
 nodes_string=`kubectl get nodes | grep -vP '^NAME' | grep -oP '^[\w\-0-9]+'`
 readarray -t nodes <<< "$nodes_string"
 rm -f $NODE_MAP

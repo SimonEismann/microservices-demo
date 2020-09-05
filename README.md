@@ -50,3 +50,13 @@ for tb in $(mysql --protocol=tcp --host=${HOST} -pzipkin -uzipkin zipkin -sN -e 
     mysql -B --protocol=tcp --host=${HOST} -pzipkin -uzipkin zipkin -e "SELECT * FROM ${tb};" | sed "s/\"/\"\"/g;s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" > dump/${tb}.csv;
 done
 ```
+
+## Measurement Scripts
+We offer two measurement scripts with a complete usage of the frontend API and a checkout only workload. A few pieces of software are required to execute them:
+```shell
+sudo apt-get install mariadb-client
+sudo apt-get install python3
+sudo apt-get install golang-go
+pip3 install pandas
+```
+Some usage examples are given in the shell files themselves.

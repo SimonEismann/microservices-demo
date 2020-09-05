@@ -1,5 +1,5 @@
-# usage: 	./execute_measurement.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY
-# example: 	./execute_measurement.sh experiments/complete 300 5
+# usage: 	./execute_measurement_complete.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY
+# example: 	./execute_measurement_complete.sh experiments/complete 300 5
 
 EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
 LOAD_DURATION=$2 			# in seconds
@@ -19,7 +19,7 @@ export ZONE=us-central1-a
 export CLUSTER_NAME=${PROJECT_ID}-1
 export MACHINE_TYPE=n1-standard-1
 services=(adservice cartservice checkoutservice currencyservice emailservice frontend paymentservice prodcatservice recommservice shippingservice zipkin)
-gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE}
+gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE} --no-enable-autoupgrade
 nodes_string=`kubectl get nodes | grep -vP '^NAME' | grep -oP '^[\w\-0-9]+'`
 readarray -t nodes <<< "$nodes_string"
 rm -f $NODE_MAP
@@ -46,7 +46,7 @@ do
 done
 # complete lua script
 rm -f $LOAD_SCRIPT
-cat src/loadgenerator/example_load.lua | sed 's/frontend:8080/${FRONTEND_ADDR}/g' > $LOAD_SCRIPT
+cat src/loadgenerator/example_load.lua | sed "s/frontend:8080/${FRONTEND_ADDR}/g" > $LOAD_SCRIPT
 echo "starting load generator..."
 pkill -f 'java -jar'
 java -jar src/loadgenerator/httploadgenerator.jar loadgenerator & java -jar src/loadgenerator/httploadgenerator.jar director --ip localhost --load $LOAD -o $LOAD_RESULT --lua $LOAD_SCRIPT -t $LOAD_INTENSITY
