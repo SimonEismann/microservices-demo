@@ -3,7 +3,7 @@ export ZONE=us-central1-a
 export CLUSTER_NAME=${PROJECT_ID}-1
 export MACHINE_TYPE=n1-standard-1		# smallest machine
 
-services=(adservice cartservice checkoutservice currencyservice emailservice frontend paymentservice prodcatservice recommservice shippingservice zipkin loadgenerator)
+services=(adservice cartservice checkoutservice currencyservice emailservice frontend paymentservice productcatalogservice recommendationservice shippingservice zipkin loadgenerator)
 
 gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE}
 
