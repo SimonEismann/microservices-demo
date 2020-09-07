@@ -15,7 +15,21 @@ Here is our (slightly) updated and more detailed service architecture, which als
 
 # Artificial Delays
 Artificial delays can be activated by setting the `DELAY_*` environment variables in the `.yaml` deployment files in the `kubernetes-manifests` folder. The variables (64-bit signed) have to be set to positive integers to activate the feature.
-The delay variable describes the amount of matrix (random values, constant size) multiplications computed before the actual task.
+The delay variable describes the amount of matrix (random values, constant size) multiplications computed before the actual task. The table below shows some measurements from an example experiment (low utilization, on n1-standard-1 nodes), where python services need much higher DELAY_* values to achieve the same time delay:
+
+| DELAY [#matrix multiplications] | Delay [ms] | TIME / MM   | Service               |
+|---------------------------------|------------|-------------|-----------------------|
+| 2                               | 0,7        | 0,35        | adservice             |
+| 4                               | 1,24       | 0,31        | cartservice           |
+| 6                               | 1,63       | 0,271666667 | cartservice           |
+| 8                               | 3,77       | 0,47125     | currencyservice       |
+| 10                              | 2,89       | 0,289       | currencyservice       |
+| 12                              | 1,21       | 0,100833333 | emailservice          |
+| 14                              | 4,77       | 0,340714286 | paymentservice        |
+| 16                              | 5,03       | 0,314375    | productcatalogservice |
+| 18                              | 13,42      | 0,745555556 | productcatalogservice |
+| 20                              | 4,95       | 0,2475      | shippingservice       |
+| 22                              | 4,01       | 0,182272727 | shippingservice       |
 
 # Building Images
 Images are built automatically using a Github Action.
