@@ -30,7 +30,7 @@ spec:
         - name: HEALTH_PORT
           value: "9557"
         - name: DELAY_GETADS
-          value: "0"
+          value: "2"
         - name: PORT
           value: "9555"
         - name: ZIPKIN_SERVICE_ADDR

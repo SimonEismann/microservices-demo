@@ -6,6 +6,7 @@ LOAD_DURATION=$2 			# in seconds
 LOAD_INTENSITY=$3			# requests per second
 ITEMS_PER_CART=$4			# avg of a normal distribution, stddev=ITEMS_PER_CART/3
 
+rm -rf $EXPERIMENT_NAME
 mkdir -p $EXPERIMENT_NAME
 
 USER_AMOUNT=$(($LOAD_DURATION * $LOAD_INTENSITY))

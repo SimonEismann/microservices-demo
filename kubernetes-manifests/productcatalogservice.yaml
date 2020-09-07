@@ -28,9 +28,9 @@ spec:
       containers:
       - env:
         - name: DELAY_LIST_PRODUCTS
-          value: "0"
+          value: "16"
         - name: DELAY_GET_PRODUCT
-          value: "0"
+          value: "18"
         - name: DELAY_SEARCH_PRODUCTS
           value: "0"
         - name: HEALTH_PORT

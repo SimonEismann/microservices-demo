@@ -30,9 +30,9 @@ spec:
         - name: PORT
           value: "7070"
         - name: DELAY_ADD_ITEM
-          value: "0"    # delay <= 0 for no delay
+          value: "4"    # delay <= 0 for no delay
         - name: DELAY_GET_CART
-          value: "0"
+          value: "6"
         - name: DELAY_EMPTY_CART
           value: "0"
         - name: REDIS_ADDR

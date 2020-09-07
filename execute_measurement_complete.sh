@@ -5,6 +5,7 @@ EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
 LOAD_DURATION=$2 			# in seconds
 LOAD_INTENSITY=$3			# requests per second
 
+rm -rf $EXPERIMENT_NAME
 mkdir -p $EXPERIMENT_NAME
 
 UTIL_FILE_PATH="${EXPERIMENT_NAME}/util_results.txt"
