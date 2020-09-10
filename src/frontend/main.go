@@ -217,7 +217,7 @@ func main() {
 	for {
 		select {
 		case <-signals:
-			ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 			srv.Shutdown(ctx)
 			return
 		}
@@ -313,7 +313,7 @@ func mustConnGRPC(ctx context.Context, conn **grpc.ClientConn, addr string) {
 	var err error
 	*conn, err = grpc.DialContext(ctx, addr,
 		grpc.WithInsecure(),
-		grpc.WithTimeout(time.Second*3),
+		grpc.WithTimeout(time.Second*10),
 		grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
 	if err != nil {
 		panic(errors.Wrapf(err, "grpc: failed to connect %s", addr))

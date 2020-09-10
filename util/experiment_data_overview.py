@@ -2,6 +2,7 @@ import pandas as pd
 import re
 import sys
 
+
 class Node:
     def __init__(self, name, instance_name):
         self.name = name
@@ -11,7 +12,8 @@ class Node:
         # self.related_nodes = set()
 
     def toString(self):
-        return self.name + ": " + self.instance_name + ", avg. utilization: " + self.avg_utilization + ", response times: " + str(self.response_times) #+ ", " + str(self.related_nodes)
+        return self.name + ": " + self.instance_name + ", avg. utilization: " + self.avg_utilization + ", response times: " + str(
+            self.response_times)  # + ", " + str(self.related_nodes)
 
     def setUtil(self, util):
         self.avg_utilization = util
@@ -44,18 +46,28 @@ for line in utilfile:
                     break
 
 zipkin_spans = pd.read_csv(EXPERIMENT_PATH + "/zipkin_spans.csv")
-# zipkin_annotations = pd.read_csv(EXPERIMENT_PATH + "/zipkin_annotations.csv")
+zipkin_annotations = pd.read_csv(EXPERIMENT_PATH + "/zipkin_annotations.csv")
+client_anns = zipkin_annotations[zipkin_annotations['a_key'].str.startswith("Client")]
+client_anns = client_anns[client_anns['a_value'].str.startswith("true")]
+
+def getClient(spanID):
+    if spanID in client_anns['span_id'].values:
+        return True
+    else:
+        return False
 
 for node in nodes:
     spans = None
     if node.name == "zipkin":
         continue
     if node.name == "frontend":
-        spans = zipkin_spans[zipkin_spans['name'].str.startswith('/')]
+        spans = zipkin_spans[zipkin_spans['name'].str.startswith('/')].copy()
+        spans["name"].replace(to_replace='/cart/\d+.*', value='/cart/{user_id}', regex=True, inplace=True)
     else:
         spans = zipkin_spans[zipkin_spans['name'].str.contains(node.name)]
+        spans = spans.loc[spans['id'].apply(lambda id: not getClient(id))]
     unique_workloads = set(spans["name"])
     for wl in unique_workloads:
-        rst = spans[(spans.name == wl)]["duration"].astype(int) / 1000 # microseconds to milliseconds
+        rst = spans[(spans.name == wl)]["duration"].astype(int) / 1000  # microseconds to milliseconds
         node.response_times[wl] = str(sum(rst) / len(rst)) + "ms"
     print(node.toString())
