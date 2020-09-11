@@ -63,6 +63,7 @@ for node in nodes:
     if node.name == "frontend":
         spans = zipkin_spans[zipkin_spans['name'].str.startswith('/')].copy()
         spans["name"].replace(to_replace='/cart/\d+.*', value='/cart/{user_id}', regex=True, inplace=True)
+        spans["name"].replace(to_replace='/product/.*', value='/product/{product_id}', regex=True, inplace=True)
     else:
         spans = zipkin_spans[zipkin_spans['name'].str.contains(node.name)]
         spans = spans.loc[spans['id'].apply(lambda id: not getClient(id))]
