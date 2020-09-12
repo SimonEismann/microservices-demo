@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mysql
+    project: hipstershopistio
+    version: v1
+  name: mysql
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+      name: mysql
+      project: hipstershopistio
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: mysql
+        name: mysql
+        project: hipstershopistio
+        version: v1
+    spec:
+      containers:
+      - env:
+        image: openzipkin/zipkin-mysql
+        imagePullPolicy: Always
+        name: mysql
+        ports:
+        - containerPort: 3306
+      serviceAccountName: mysql
+      nodeSelector:
+        service: zipkin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mysql
+    name: mysql
+    project: hipstershopistio
+    service: mysql
+  name: mysql
+  namespace: default
+spec:
+  ports:
+  - name: conn-mysql
+    port: 3306
+    targetPort: 3306
+  selector:
+    app: mysql
+    project: hipstershopistio
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mysql
+  namespace: default

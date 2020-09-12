@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: cartservice
+    app: paymentservice
     project: hipstershopistio
     version: v1
-  name: cartservice
+  name: paymentservice
   namespace: default
 spec:
   minReadySeconds: 10
@@ -13,50 +13,46 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: cartservice
-      name: cartservice
+      app: paymentservice
+      name: paymentservice
       project: hipstershopistio
       version: v1
   template:
     metadata:
       labels:
-        app: cartservice
-        name: cartservice
+        app: paymentservice
+        name: paymentservice
         project: hipstershopistio
         version: v1
     spec:
       containers:
       - env:
+        - name: HEALTH_PORT
+          value: "50053"
+        - name: DELAY_CHARGE
+          value: "80"
         - name: PORT
-          value: "7070"
-        - name: DELAY_ADD_ITEM
-          value: "80" 
-        - name: DELAY_GET_CART
-          value: "60"
-        - name: DELAY_EMPTY_CART
-          value: "90"
-        - name: REDIS_ADDR
-          value: redis-cart:6379
+          value: "50051"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/cartservice:master
+        image: simoneismann/paymentservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7072
-        name: cartservice
+            - -addr=:50053
+        name: paymentservice
         ports:
-        - containerPort: 7070
+        - containerPort: 50051
           name: grpc
-        - containerPort: 7072
+        - containerPort: 50053
           name: health
         readinessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7072
+            - -addr=:50053
         resources:
           limits:
             cpu: 200m
@@ -64,35 +60,35 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
-      serviceAccountName: cartservice
+      serviceAccountName: paymentservice
       nodeSelector:
-        service: cartservice
+        service: paymentservice
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: cartservice
-    name: cartservice
+    app: paymentservice
+    name: paymentservice
     project: hipstershopistio
-    service: cartservice
-  name: cartservice
+    service: paymentservice
+  name: paymentservice
   namespace: default
 spec:
   ports:
-  - name: grpc-cartservice
-    port: 7070
-    targetPort: 7070
-  - name: health-cartservice
-    port: 7072
-    targetPort: 7072
+  - name: grpc-paymentservice
+    port: 50051
+    targetPort: 50051
+  - name: health-paymentservice
+    port: 50053
+    targetPort: 50053
   selector:
-    app: cartservice
+    app: paymentservice
     project: hipstershopistio
   type: ClusterIP
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cartservice
+  name: paymentservice
   namespace: default

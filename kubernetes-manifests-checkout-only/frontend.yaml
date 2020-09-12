@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frontend
+    project: hipstershopistio
+    version: v1
+  name: frontend
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: frontend
+      name: frontend
+      project: hipstershopistio
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "true"
+      labels:
+        app: frontend
+        name: frontend
+        project: hipstershopistio
+        version: v1
+    spec:
+      containers:
+      - env:
+        - name: AD_SERVICE_ADDR
+          value: adservice:9555
+        - name: CART_SERVICE_ADDR
+          value: cartservice:7070
+        - name: CHECKOUT_SERVICE_ADDR
+          value: checkoutservice:5050
+        - name: CURRENCY_SERVICE_ADDR
+          value: currencyservice:7000
+        - name: PRODUCT_CATALOG_SERVICE_ADDR
+          value: productcatalogservice:3550
+        - name: RECOMMENDATION_SERVICE_ADDR
+          value: recommendationservice:8080
+        - name: SHIPPING_SERVICE_ADDR
+          value: shippingservice:50051
+        - name: SRVURL
+          value: :8080
+        - name: ZIPKIN_SERVICE_ADDR
+          value: zipkin:9411
+        - name: DELAY_HOME
+          value: "0"
+        - name: DELAY_PRODUCT
+          value: "0"
+        - name: DELAY_CART_GET
+          value: "0"
+        - name: DELAY_CART_ADD
+          value: "0"
+        - name: DELAY_CART_EMPTY
+          value: "0"
+        - name: DELAY_CHECKOUT
+          value: "40"
+        - name: DELAY_SET_CURRENCY
+          value: "0"
+        - name: DELAY_LOGOUT
+          value: "0"
+        image: simoneismann/frontend:master
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            httpHeaders:
+            - name: Cookie
+              value: shop_session-id=x-readiness-probe
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+        name: frontend
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          httpGet:
+            httpHeaders:
+            - name: Cookie
+              value: shop_session-id=x-readiness-probe
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+      serviceAccountName: frontend
+      nodeSelector:
+        service: frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: frontend
+    name: frontend
+    project: hipstershopistio
+    service: frontend
+  name: frontend
+  namespace: default
+spec:
+  ports:
+  - name: http-frontend
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: frontend
+    project: hipstershopistio
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: frontend
+  namespace: default

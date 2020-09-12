@@ -79,7 +79,7 @@ func addCart(cart_index_start int64, itemAmount int64, cartAmount int64) {
 	client := connectToRedis()
 	for i := cart_index_start; i < cart_index_start+cartAmount; i++ {
 		items := []*pb.CartItem{}
-		finalItemAmount := int(math.Max(rand.NormFloat64()*float64(itemAmount)/3+float64(itemAmount), 1.0)) // normal distribution of itemAmount with with stddev=itemAmount/3
+		finalItemAmount := int(math.Max(rand.NormFloat64()*float64(itemAmount)/9+float64(itemAmount), 1.0)) // normal distribution of itemAmount with with stddev=itemAmount/9
 		for j := 0; j < finalItemAmount; j++ {
 			items = append(items, &pb.CartItem{
 				ProductId: PRODUCTS[j%len(PRODUCTS)],

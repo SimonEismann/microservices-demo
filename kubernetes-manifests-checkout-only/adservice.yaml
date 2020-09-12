@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: cartservice
+    app: adservice
     project: hipstershopistio
     version: v1
-  name: cartservice
+  name: adservice
   namespace: default
 spec:
   minReadySeconds: 10
@@ -13,50 +13,46 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: cartservice
-      name: cartservice
+      app: adservice
+      name: adservice
       project: hipstershopistio
       version: v1
   template:
     metadata:
       labels:
-        app: cartservice
-        name: cartservice
+        app: adservice
+        name: adservice
         project: hipstershopistio
         version: v1
     spec:
       containers:
       - env:
+        - name: HEALTH_PORT
+          value: "9557"
+        - name: DELAY_GETADS
+          value: "0"
         - name: PORT
-          value: "7070"
-        - name: DELAY_ADD_ITEM
-          value: "80" 
-        - name: DELAY_GET_CART
-          value: "60"
-        - name: DELAY_EMPTY_CART
-          value: "90"
-        - name: REDIS_ADDR
-          value: redis-cart:6379
+          value: "9555"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/cartservice:master
+        image: simoneismann/adservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7072
-        name: cartservice
+            - -addr=:9557
+        name: adservice
         ports:
-        - containerPort: 7070
+        - containerPort: 9555
           name: grpc
-        - containerPort: 7072
+        - containerPort: 9557
           name: health
         readinessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7072
+            - -addr=:9557
         resources:
           limits:
             cpu: 200m
@@ -64,35 +60,35 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
-      serviceAccountName: cartservice
+      serviceAccountName: adservice
       nodeSelector:
-        service: cartservice
+        service: adservice
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: cartservice
-    name: cartservice
+    app: adservice
+    name: adservice
     project: hipstershopistio
-    service: cartservice
-  name: cartservice
+    service: adservice
+  name: adservice
   namespace: default
 spec:
   ports:
-  - name: grpc-cartservice
-    port: 7070
-    targetPort: 7070
-  - name: health-cartservice
-    port: 7072
-    targetPort: 7072
+  - name: grpc-adservice
+    port: 9555
+    targetPort: 9555
+  - name: health-adservice
+    port: 9557
+    targetPort: 9557
   selector:
-    app: cartservice
+    app: adservice
     project: hipstershopistio
   type: ClusterIP
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cartservice
+  name: adservice
   namespace: default

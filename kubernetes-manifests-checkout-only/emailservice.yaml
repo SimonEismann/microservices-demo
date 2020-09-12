@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: cartservice
+    app: emailservice
     project: hipstershopistio
     version: v1
-  name: cartservice
+  name: emailservice
   namespace: default
 spec:
   minReadySeconds: 10
@@ -13,50 +13,48 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: cartservice
-      name: cartservice
+      app: emailservice
+      name: emailservice
       project: hipstershopistio
       version: v1
   template:
     metadata:
       labels:
-        app: cartservice
-        name: cartservice
+        app: emailservice
+        name: emailservice
         project: hipstershopistio
         version: v1
     spec:
       containers:
       - env:
+        - name: ENABLE_PROFILER
+          value: "0"
+        - name: DELAY_SEND_CONFIRMATION
+          value: "200"
+        - name: HEALTH_PORT
+          value: "8081"
         - name: PORT
-          value: "7070"
-        - name: DELAY_ADD_ITEM
-          value: "80" 
-        - name: DELAY_GET_CART
-          value: "60"
-        - name: DELAY_EMPTY_CART
-          value: "90"
-        - name: REDIS_ADDR
-          value: redis-cart:6379
+          value: "8080"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
-        image: simoneismann/cartservice:master
+        image: simoneismann/emailservice:master
         imagePullPolicy: Always
         livenessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7072
-        name: cartservice
+            - -addr=:8081
+        name: emailservice
         ports:
-        - containerPort: 7070
+        - containerPort: 8080
           name: grpc
-        - containerPort: 7072
+        - containerPort: 8081
           name: health
         readinessProbe:
           exec:
             command:
             - /bin/grpc_health_probe
-            - -addr=:7072
+            - -addr=:8081
         resources:
           limits:
             cpu: 200m
@@ -64,35 +62,35 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
-      serviceAccountName: cartservice
+      serviceAccountName: emailservice
       nodeSelector:
-        service: cartservice
+        service: emailservice
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: cartservice
-    name: cartservice
+    app: emailservice
+    name: emailservice
     project: hipstershopistio
-    service: cartservice
-  name: cartservice
+    service: emailservice
+  name: emailservice
   namespace: default
 spec:
   ports:
-  - name: grpc-cartservice
-    port: 7070
-    targetPort: 7070
-  - name: health-cartservice
-    port: 7072
-    targetPort: 7072
+  - name: grpc-emailservice
+    port: 8080
+    targetPort: 8080
+  - name: health-emailservice
+    port: 8081
+    targetPort: 8081
   selector:
-    app: cartservice
+    app: emailservice
     project: hipstershopistio
   type: ClusterIP
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cartservice
+  name: emailservice
   namespace: default
