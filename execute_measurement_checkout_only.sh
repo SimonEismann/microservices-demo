@@ -21,7 +21,7 @@ OVERVIEW="${EXPERIMENT_NAME}/overview.txt"
 export PROJECT_ID=`gcloud config get-value project`
 export ZONE=us-central1-a
 export CLUSTER_NAME=${PROJECT_ID}-1
-export MACHINE_TYPE=n2-highcpu-4
+export MACHINE_TYPE=n1-standard-2
 services=(adservice cartservice checkoutservice currencyservice emailservice frontend paymentservice productcatalogservice recommendationservice shippingservice zipkin)
 gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE} --no-enable-autoupgrade
 nodes_string=`kubectl get nodes | grep -vP '^NAME' | grep -oP '^[\w\-0-9]+'`
@@ -33,7 +33,7 @@ do
 	kubectl label nodes ${nodes[index]} service=${services[index]}
 	printf "${services[index]},${nodes[index]}\n" >> $NODE_MAP
 done
-kubectl apply -k ./kubernetes-manifests #-f ./kubernetes-manifests-checkout-only	# deploys specially prepared delays
+kubectl apply -f ./kubernetes-manifests-checkout-only	# deploys specially prepared delays
 kubectl get pods -o wide	# show deployment of pods for verification
 
 echo "waiting for system to boot up... (3 minutes)"
