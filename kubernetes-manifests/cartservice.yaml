@@ -30,11 +30,11 @@ spec:
         - name: PORT
           value: "7070"
         - name: DELAY_ADD_ITEM
-          value: "80" 
+          value: "0" 
         - name: DELAY_GET_CART
-          value: "60"
+          value: "0"
         - name: DELAY_EMPTY_CART
-          value: "90"
+          value: "0"
         - name: REDIS_ADDR
           value: redis-cart:6379
         - name: ZIPKIN_SERVICE_ADDR

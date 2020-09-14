@@ -33,7 +33,7 @@ do
 	kubectl label nodes ${nodes[index]} service=${services[index]}
 	printf "${services[index]},${nodes[index]}\n" >> $NODE_MAP
 done
-kubectl apply -f ./kubernetes-manifests-checkout-only	# deploys specially prepared delays
+kubectl apply -k ./kubernetes-manifests #-f ./kubernetes-manifests-checkout-only	# deploys specially prepared delays
 kubectl get pods -o wide	# show deployment of pods for verification
 
 echo "waiting for system to boot up... (3 minutes)"
