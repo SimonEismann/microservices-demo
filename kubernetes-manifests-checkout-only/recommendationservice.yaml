@@ -30,7 +30,7 @@ spec:
         - name: ENABLE_PROFILER
           value: "0"
         - name: DELAY_LIST_RECOMMS
-          value: "150"
+          value: "90"
         - name: HEALTH_PORT
           value: "8081"
         - name: PORT
