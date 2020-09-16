@@ -41,7 +41,7 @@ sleep 180
 REDIS_ADDR="$(kubectl -n default get service redis-cart -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):6379"
 FRONTEND_ADDR="$(kubectl -n default get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):8080"
 echo "populating cart data base with ${USER_AMOUNT} carts..."
-cd util/cart-populator
+cd util/cart-populator-1
 go run populator.go $REDIS_ADDR $USER_AMOUNT $ITEMS_PER_CART
 cd ../..
 echo "generate config files for loadgenerator..."
