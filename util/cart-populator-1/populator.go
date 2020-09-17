@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "cart-populator/genproto"
+	pb "cart-populator-1/genproto"
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"

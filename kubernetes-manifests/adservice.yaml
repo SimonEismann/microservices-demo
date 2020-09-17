@@ -53,13 +53,6 @@ spec:
             command:
             - /bin/grpc_health_probe
             - -addr=:9557
-        resources:
-          limits:
-            cpu: 200m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 64Mi
       serviceAccountName: adservice
       nodeSelector:
         service: adservice

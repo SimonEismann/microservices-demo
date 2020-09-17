@@ -55,13 +55,6 @@ spec:
             command:
             - /bin/grpc_health_probe
             - -addr=:8081
-        resources:
-          limits:
-            cpu: 200m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 64Mi
       serviceAccountName: emailservice
       nodeSelector:
         service: emailservice

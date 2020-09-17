@@ -43,13 +43,6 @@ spec:
           periodSeconds: 5
           tcpSocket:
             port: 6379
-        resources:
-          limits:
-            cpu: 200m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 64Mi
         volumeMounts:
         - mountPath: /data
           name: redis-data
