@@ -39,8 +39,8 @@ def passTime(t):
     if t <= 0:
         return
     for i in range(t):  # create and multiply two random 50x50 matrices (values in [0,1)) until t is reached
-        m1 = np.random.rand(50, 50)
-        m2 = np.random.rand(50, 50)
+        m1 = np.arange(2500).reshape((50, 50))  # np.random.rand(50, 50)
+        m2 = np.arange(2500).reshape((50, 50))  # np.random.rand(50, 50)
         np.matmul(m1, m2)
 
 sendConfirmationDelay = int(os.environ.get("DELAY_LIST_RECOMMS", '0'))

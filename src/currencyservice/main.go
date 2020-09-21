@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
-	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -85,7 +84,7 @@ func passTime(t int64) {
 func createMatrix(size int) *mat.Dense {
 	data := make([]float64, size * size)
 	for i := range data {
-		data[i] = rand.NormFloat64()
+		data[i] = float64(i)
 	}
 	a := mat.NewDense(size, size, data)
 	return a
