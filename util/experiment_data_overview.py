@@ -22,6 +22,7 @@ class Node:
 EXPERIMENT_PATH = sys.argv[1]
 UTIL_TS_PATTERN = re.compile('^Timeseries:.*key:\"instance_name\" value:\"([\w\-]+)\"\}.*$')
 UTIL_U_PATTERN = re.compile('^.*Utilization: ([\d\.]+)$')
+CLIENT_POSTFIX = " CLIENT"
 
 # read files
 nodemap = pd.read_csv(EXPERIMENT_PATH + "/nodemap.txt", header=None, names=["service", "instance"])
@@ -37,11 +38,12 @@ for line in utilfile:
                 service_name = row["service"]
                 break
         nodes.append(Node(service_name, res.group(1)))
+        nodes.append(Node(service_name + CLIENT_POSTFIX, res.group(1)))
     else:
         res2 = UTIL_U_PATTERN.match(line)
         if res2:
             for node in nodes:
-                if node.name == service_name:
+                if node.name.startswith(service_name):
                     node.setUtil(res2.group(1))
                     break
 
@@ -50,12 +52,15 @@ zipkin_annotations = pd.read_csv(EXPERIMENT_PATH + "/zipkin_annotations.csv")
 client_anns = zipkin_annotations[zipkin_annotations['a_key'].str.startswith("Client")]
 client_anns = client_anns[client_anns['a_value'].str.startswith("true")]
 
+
 def getClient(spanID):
     if spanID in client_anns['span_id'].values:
         return True
     else:
         return False
 
+
+nodes.sort(key=lambda node: node.name)
 for node in nodes:
     spans = None
     if node.name == "zipkin":
@@ -64,6 +69,10 @@ for node in nodes:
         spans = zipkin_spans[zipkin_spans['name'].str.startswith('/')].copy()
         spans["name"].replace(to_replace='/cart/\d+.*', value='/cart/{user_id}', regex=True, inplace=True)
         spans["name"].replace(to_replace='/product/.*', value='/product/{product_id}', regex=True, inplace=True)
+    elif node.name.endswith(CLIENT_POSTFIX):
+        node_name = re.sub(CLIENT_POSTFIX + "$", '', node.name)
+        spans = zipkin_spans[zipkin_spans['name'].str.contains(node_name)]
+        spans = spans.loc[spans['id'].apply(lambda id: getClient(id))]
     else:
         spans = zipkin_spans[zipkin_spans['name'].str.contains(node.name)]
         spans = spans.loc[spans['id'].apply(lambda id: not getClient(id))]

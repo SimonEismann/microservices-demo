@@ -30,7 +30,7 @@ spec:
         - name: HEALTH_PORT
           value: "50053"
         - name: DELAY_CHARGE
-          value: "40"
+          value: "70"
         - name: PORT
           value: "50051"
         - name: ZIPKIN_SERVICE_ADDR

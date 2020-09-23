@@ -21,7 +21,7 @@ OVERVIEW="${EXPERIMENT_NAME}/overview.txt"
 export PROJECT_ID=`gcloud config get-value project`
 export ZONE=us-central1-a
 export CLUSTER_NAME=${PROJECT_ID}-1
-export MACHINE_TYPE=n1-standard-1
+export MACHINE_TYPE=n1-standard-4
 services=(adservice cartservice checkoutservice currencyservice emailservice frontend paymentservice productcatalogservice recommendationservice shippingservice zipkin)
 gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE} --no-enable-autoupgrade
 nodes_string=`kubectl get nodes | grep -vP '^NAME' | grep -oP '^[\w\-0-9]+'`
