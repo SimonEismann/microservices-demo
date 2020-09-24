@@ -28,11 +28,11 @@ spec:
       containers:
       - env:
         - name: DELAY_LIST_PRODUCTS
-          value: "130"
+          value: "160"
         - name: DELAY_GET_PRODUCT
-          value: "130"
+          value: "160"
         - name: DELAY_SEARCH_PRODUCTS
-          value: "130"
+          value: "160"
         - name: HEALTH_PORT
           value: "3552"
         - name: PORT
