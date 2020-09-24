@@ -63,7 +63,7 @@ def getClient(spanID):
 nodes.sort(key=lambda node: node.name)
 for node in nodes:
     spans = None
-    if node.name.startswith("zipkin") or len(node.response_times) == 0:
+    if node.name.startswith("zipkin"):
         continue
     if node.name == "frontend":
         spans = zipkin_spans[zipkin_spans['name'].str.startswith('/')].copy()
@@ -80,4 +80,5 @@ for node in nodes:
     for wl in unique_workloads:
         rst = spans[(spans.name == wl)]["duration"].astype(int) / 1000  # microseconds to milliseconds
         node.response_times[wl] = str(sum(rst) / len(rst)) + "ms"
-    print(node.toString())
+    if not len(node.response_times) == 0:
+        print(node.toString())
