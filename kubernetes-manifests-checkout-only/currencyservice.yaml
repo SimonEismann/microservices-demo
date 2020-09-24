@@ -30,9 +30,9 @@ spec:
         - name: PORT
           value: "7000"
         - name: DELAY_CONVERT
-          value: "40"
+          value: "140"
         - name: DELAY_GET_CURRENCIES
-          value: "40"
+          value: "140"
         - name: ZIPKIN_SERVICE_ADDR
           value: zipkin:9411
         image: simoneismann/currencyservice:master

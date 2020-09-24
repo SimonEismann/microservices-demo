@@ -30,9 +30,9 @@ spec:
         - name: HEALTH_PORT
           value: "50053"
         - name: DELAY_GET_QUOTE
-          value: "50"
+          value: "160"
         - name: DELAY_SHIP_ORDER
-          value: "50"
+          value: "160"
         - name: PORT
           value: "50051"
         - name: ZIPKIN_SERVICE_ADDR

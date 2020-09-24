@@ -63,7 +63,7 @@ def getClient(spanID):
 nodes.sort(key=lambda node: node.name)
 for node in nodes:
     spans = None
-    if node.name == "zipkin":
+    if node.name.startswith("zipkin") or len(node.response_times) == 0:
         continue
     if node.name == "frontend":
         spans = zipkin_spans[zipkin_spans['name'].str.startswith('/')].copy()
