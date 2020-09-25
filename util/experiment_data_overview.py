@@ -20,6 +20,7 @@ class Node:
 
 
 EXPERIMENT_PATH = sys.argv[1]
+DO_EXPORT = sys.argv[2].startswith("export=true")   # tells if script should export training data from spans
 UTIL_TS_PATTERN = re.compile('^Timeseries:.*key:\"instance_name\" value:\"([\w\-]+)\"\}.*$')
 UTIL_U_PATTERN = re.compile('^.*Utilization: ([\d\.]+)$')
 CLIENT_POSTFIX = " CLIENT"
@@ -78,7 +79,15 @@ for node in nodes:
         spans = spans.loc[spans['id'].apply(lambda id: not getClient(id))]
     unique_workloads = set(spans["name"])
     for wl in unique_workloads:
-        rst = spans[(spans.name == wl)]["duration"].astype(int) / 1000  # microseconds to milliseconds
+        tmp = spans[(spans.name == wl)]
+        rst = tmp["duration"].astype(int) / 1000  # microseconds to milliseconds
+        if DO_EXPORT and not node.name.endswith(CLIENT_POSTFIX):
+            f = open(EXPERIMENT_PATH + "/training_data/" + wl.replace("/", "") + ".csv", "w")
+            for index, span in tmp.iterrows():
+                start = int(span["start_ts"])
+                end = start + int(span["duration"])
+                f.write(str(start) + "," + str(end) + "\n")
+            f.close()
         node.response_times[wl] = str(sum(rst) / len(rst)) + "ms"
     if not len(node.response_times) == 0:
         print(node.toString())

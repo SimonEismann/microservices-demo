@@ -56,10 +56,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	itemAmount, err := strconv.ParseInt(args[2], 10, 64)
-	if err != nil {
-		fmt.Println(err)
-	}
 	threadAmount := int(math.Ceil(float64(cartAmount) / CARTS_PER_THREAD))
 	wg.Add(threadAmount)
 	for i := 0; i < threadAmount; i++ {
@@ -68,12 +64,12 @@ func main() {
 		if i >= threadAmount-1 {
 			carts = cartAmount - offset
 		}
-		go addCart(START_INDEX+offset, itemAmount, carts) // adds cart in new thread
+		go addCart(START_INDEX+offset, carts) // adds cart in new thread
 	}
 	wg.Wait()
 }
 
-func addCart(cart_index_start int64, itemAmount int64, cartAmount int64) {
+func addCart(cart_index_start int64, cartAmount int64) {
 	defer wg.Done()
 	client := connectToRedis()
 	for i := cart_index_start; i < cart_index_start+cartAmount; i++ {

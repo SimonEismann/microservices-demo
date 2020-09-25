@@ -1,10 +1,9 @@
-# usage: 	./execute_measurement_checkout_only.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY $ITEMS_PER_CART
-# example: 	./execute_measurement_checkout_only.sh experiments/checkout 300 10 7
+# usage: 	./execute_measurement_checkout_only.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY
+# example: 	./execute_measurement_checkout_only.sh experiments/checkout 300 20
 
 EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
 LOAD_DURATION=$2 			# in seconds
 LOAD_INTENSITY=$3			# requests per second
-ITEMS_PER_CART=$4			# avg of a normal distribution, stddev=ITEMS_PER_CART/9
 
 rm -rf $EXPERIMENT_NAME
 mkdir -p $EXPERIMENT_NAME
@@ -42,7 +41,7 @@ REDIS_ADDR="$(kubectl -n default get service redis-cart -o jsonpath='{.status.lo
 FRONTEND_ADDR="$(kubectl -n default get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):8080"
 echo "populating cart data base with ${USER_AMOUNT} carts..."
 cd util/cart-populator-1
-go run populator.go $REDIS_ADDR $USER_AMOUNT $ITEMS_PER_CART
+go run populator.go $REDIS_ADDR $USER_AMOUNT
 cd ../..
 echo "generate config files for loadgenerator..."
 # generate user id file
@@ -79,5 +78,16 @@ MYSQL_ADDR="$(kubectl -n default get service mysql -o jsonpath='{.status.loadBal
 for tb in $(mysql --protocol=tcp --host=${MYSQL_ADDR} -pzipkin -uzipkin zipkin -sN -e "SHOW TABLES;"); do
     mysql -B --protocol=tcp --host=${MYSQL_ADDR} -pzipkin -uzipkin zipkin -e "SELECT * FROM ${tb};" | sed "s/\"/\"\"/g;s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" > ${EXPERIMENT_NAME}/${tb}.csv;
 done
-python3 util/experiment_data_overview.py $EXPERIMENT_NAME > $OVERVIEW
+python3 util/experiment_data_overview.py $EXPERIMENT_NAME export=true > $OVERVIEW
+# parse to training data from logs
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data cartservice.csv hipstershop.cartservice.emptycart.csv,hipstershop.cartservice.getcart.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data checkoutservice.csv hipstershop.checkoutservice.placeorder.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data currencyservice.csv hipstershop.currencyservice.convert.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data emailservice.csv recv.hipstershop.emailservice.sendorderconfirmation.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data frontend.csv cartcheckout.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data paymentservice.csv hipstershop.paymentservice.charge.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data productcatalogservice.csv hipstershop.productcatalogservice.getproduct.csv,hipstershop.productcatalogservice.listproducts.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data recommendationservice.csv recv.hipstershop.recommendationservice.listrecommendations.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data shippingservice.csv hipstershop.shippingservice.shiporder.csv,hipstershop.shippingservice.getquote.csv
 echo "finished measurement successfully! All data can be found in ${EXPERIMENT_NAME}."
+gcloud container clusters delete $CLUSTER_NAME --zone=$ZONE
