@@ -68,6 +68,7 @@ done
 ## Measurement Scripts
 We offer two measurement scripts with a complete usage of the frontend API and a checkout only workload. A few pieces of software are required to execute them:
 ```shell
+sudo apt-get install open-jre
 sudo apt-get install mariadb-client
 sudo apt-get install python3
 sudo apt-get install golang-go

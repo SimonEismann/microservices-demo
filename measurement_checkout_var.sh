@@ -85,4 +85,4 @@ python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data productcata
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data recommendationservice.csv recv.hipstershop.recommendationservice.listrecommendations.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data shippingservice.csv hipstershop.shippingservice.shiporder.csv,hipstershop.shippingservice.getquote.csv
 echo "finished measurement successfully! All data can be found in ${EXPERIMENT_NAME}."
-gcloud container clusters delete $CLUSTER_NAME --zone=$ZONE
+gcloud container clusters delete $CLUSTER_NAME --zone=$ZONE --quiet
