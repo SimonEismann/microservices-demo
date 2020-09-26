@@ -1,12 +1,12 @@
-# usage: 	./execute_measurement_checkout_only.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY
-# example: 	./execute_measurement_checkout_only.sh experiments/checkout 300 20
+# usage: 	./measurement_checkout_var.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY
+# example: 	./measurement_checkout_var.sh experiments/checkout-var 300 20
 
 EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
 LOAD_DURATION=$2 			# in seconds
-LOAD_INTENSITY=$3			# requests per second
+LOAD_INTENSITY=$3			# max requests per second
 
 rm -rf $EXPERIMENT_NAME
-mkdir -p $EXPERIMENT_NAME
+mkdir -p $EXPERIMENT_NAME/training_data
 
 USER_AMOUNT=$(($LOAD_DURATION * $LOAD_INTENSITY))
 UTIL_FILE_PATH="${EXPERIMENT_NAME}/util_results.txt"
@@ -53,12 +53,7 @@ do
 done
 # generate load.csv
 rm -f $LOAD
-touch $LOAD
-for ((n=1;n<=$LOAD_DURATION;n++))
-do
-	timestamp=$((n - 1)).5
-	printf "$timestamp,$LOAD_INTENSITY\n" >> $LOAD
-done
+python3 util/generate_var_load.py $LOAD 0 $LOAD_INTENSITY $LOAD_DURATION
 # checkout only lua script
 rm -f $LOAD_SCRIPT
 touch $LOAD_SCRIPT
