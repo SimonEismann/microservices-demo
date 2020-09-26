@@ -13,11 +13,12 @@ writer = csv.writer(open(TRAINING_DATA_FOLDER_PATH + "/" + OUTPUT_FILE_NAME, "w"
 writer.writerow(["Response Time", "Concurrency"])
 
 for index, row in dataframe.iterrows():
-    to_remove = []
-    for open_request in open_requests:
+    to_remove = []  # indizes of elements to remove
+    for index2, open_request in enumerate(open_requests):
         if open_request['end'] < row['start']:
-            to_remove.append(open_request)
+            to_remove.append(index2)
+    to_remove.reverse()     # remove last index first to avoid index shifting
     for req in to_remove:
-        open_requests.remove(req)
+        del open_requests[req]
     writer.writerow([(int(row['end']) - int(row['start'])) / 1000, len(open_requests) + 1])     # mikro to milliseconds
     open_requests.append(row)
