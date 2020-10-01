@@ -84,5 +84,16 @@ python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data paymentserv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data productcatalogservice.csv hipstershop.productcatalogservice.getproduct.csv,hipstershop.productcatalogservice.listproducts.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data recommendationservice.csv recv.hipstershop.recommendationservice.listrecommendations.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data shippingservice.csv hipstershop.shippingservice.shiporder.csv,hipstershop.shippingservice.getquote.csv
+# generate weka models
+MODEL_TYPE="M5P"
+java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/cartservice.csv ${EXPERIMENT_NAME}/training_data/cartservice.model
+java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/checkoutservice.csv ${EXPERIMENT_NAME}/training_data/checkoutservice.model
+java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/currencyservice.csv ${EXPERIMENT_NAME}/training_data/currencyservice.model
+java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/emailservice.csv ${EXPERIMENT_NAME}/training_data/emailservice.model
+java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/frontend.csv ${EXPERIMENT_NAME}/training_data/frontend.model
+java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/paymentservice.csv ${EXPERIMENT_NAME}/training_data/paymentservice.model
+java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/productcatalogservice.csv ${EXPERIMENT_NAME}/training_data/productcatalogservice.model
+java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/recommendationservice.csv ${EXPERIMENT_NAME}/training_data/recommendationservice.model
+java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/shippingservice.csv ${EXPERIMENT_NAME}/training_data/shippingservice.model
 echo "finished measurement successfully! All data can be found in ${EXPERIMENT_NAME}."
 gcloud container clusters delete $CLUSTER_NAME --zone=$ZONE --quiet
