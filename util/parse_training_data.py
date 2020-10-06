@@ -10,7 +10,7 @@ dataframe = pd.concat([pd.read_csv(TRAINING_DATA_FOLDER_PATH + "/" + f, sep=',',
 dataframe = dataframe.sort_values(by=['start'])
 open_requests = []
 writer = csv.writer(open(TRAINING_DATA_FOLDER_PATH + "/" + OUTPUT_FILE_NAME, "w", newline=''), delimiter=',')
-writer.writerow(["Response Time", "Concurrency"])
+writer.writerow(["Response Time", "Concurrency 1"])
 
 for index, row in dataframe.iterrows():
     to_remove = []  # indizes of elements to remove
