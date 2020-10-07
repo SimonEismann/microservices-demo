@@ -84,8 +84,6 @@ func addCart(cart_index_start int64, cartAmount int64) {
 		err := client.Set(context.Background(), strconv.Itoa(int(i)), *cartItemsToString(&items), 0).Err()
 		if err != nil {
 			fmt.Println(err)
-		} else {
-			fmt.Printf("cart %d added with %d items\n", i, finalItemAmount)
 		}
 	}
 	err := client.Close()
