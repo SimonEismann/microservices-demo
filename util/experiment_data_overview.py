@@ -7,22 +7,28 @@ class Node:
     def __init__(self, name, instance_name):
         self.name = name
         self.instance_name = instance_name
+        self.avg_resptime = 0.0
         self.avg_utilization = "not defined"
+        self.max_utilization = "not defined"
         self.response_times = dict()
         # self.related_nodes = set()
 
     def toString(self):
-        return self.name + ": " + self.instance_name + ", avg. utilization: " + self.avg_utilization + ", response times: " + str(
+        return self.name + ": " + self.instance_name + ", avg. response time: " + str(self.avg_resptime) + ", avg. utilization: " + self.avg_utilization + ", max utilization: " + self.max_utilization + ", response times: " + str(
             self.response_times)  # + ", " + str(self.related_nodes)
 
-    def setUtil(self, util):
+    def setAvgUtil(self, util):
         self.avg_utilization = util
+
+    def setMaxUtil(self, util):
+        self.max_utilization = util
 
 
 EXPERIMENT_PATH = sys.argv[1]
 DO_EXPORT = sys.argv[2].startswith("export=true")   # tells if script should export training data from spans
 UTIL_TS_PATTERN = re.compile('^Timeseries:.*key:\"instance_name\" value:\"([\w\-]+)\"\}.*$')
-UTIL_U_PATTERN = re.compile('^.*Utilization: ([\d\.]+)$')
+UTIL_AVG_PATTERN = re.compile('^Average Utilization: ([\d\.]+)$')
+UTIL_MAX_PATTERN = re.compile('^Max Utilization: ([\d\.]+)$')
 CLIENT_POSTFIX = " CLIENT"
 
 # read files
@@ -41,12 +47,19 @@ for line in utilfile:
         nodes.append(Node(service_name, res.group(1)))
         nodes.append(Node(service_name + CLIENT_POSTFIX, res.group(1)))
     else:
-        res2 = UTIL_U_PATTERN.match(line)
+        res2 = UTIL_AVG_PATTERN.match(line)
         if res2:
             for node in nodes:
                 if node.name.startswith(service_name):
-                    node.setUtil(res2.group(1))
+                    node.setAvgUtil(res2.group(1))
                     break
+        else:
+            res3 = UTIL_MAX_PATTERN.match(line)
+            if res3:
+                for node in nodes:
+                    if node.name.startswith(service_name):
+                        node.setMaxUtil(res3.group(1))
+                        break
 
 zipkin_spans = pd.read_csv(EXPERIMENT_PATH + "/zipkin_spans.csv")
 zipkin_annotations = pd.read_csv(EXPERIMENT_PATH + "/zipkin_annotations.csv")
@@ -78,6 +91,7 @@ for node in nodes:
         spans = zipkin_spans[zipkin_spans['name'].str.contains(node.name)]
         spans = spans.loc[spans['id'].apply(lambda id: not getClient(id))]
     unique_workloads = set(spans["name"])
+    node.avg_resptime = spans["duration"].mean() / 1000
     for wl in unique_workloads:
         tmp = spans[(spans.name == wl)]
         rst = tmp["duration"].astype(int) / 1000  # microseconds to milliseconds

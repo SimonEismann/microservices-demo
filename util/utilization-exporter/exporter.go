@@ -55,10 +55,15 @@ func main() {
 		fmt.Printf("Timeseries: %s\n", timeseries.String())
 		points := timeseries.Points
 		avg_util := 0.0
+		max_util := 0.0
 		for i := 0; i < len(points); i++  {
 			fmt.Printf("Point: %s --> %s\n", points[i].Interval.String(), points[i].Value.String())
 			avg_util += points[i].Value.GetDoubleValue()
+			if points[i].Value.GetDoubleValue() > max_util {
+				max_util = points[i].Value.GetDoubleValue()
+			}
 		}
 		fmt.Printf("Average Utilization: %f\n", avg_util / float64(len(points)))
+		fmt.Printf("Max Utilization: %f\n", max_util)
 	}
 }
