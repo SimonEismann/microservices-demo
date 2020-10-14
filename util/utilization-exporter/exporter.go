@@ -6,6 +6,7 @@ import (
 	"google.golang.org/api/iterator"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"time"
 
@@ -65,5 +66,12 @@ func main() {
 		}
 		fmt.Printf("Average Utilization: %f\n", avg_util / float64(len(points)))
 		fmt.Printf("Max Utilization: %f\n", max_util)
+		// get the top 3 utilizations
+		if len(points) >=3 {
+			sort.SliceStable(points, func(i, j int) bool {
+				return points[i].Value.GetDoubleValue() < points[j].Value.GetDoubleValue()
+			})
+			fmt.Printf("Top3 Utilization: %f\n", (points[len(points)-1].Value.GetDoubleValue() + points[len(points)-2].Value.GetDoubleValue() + points[len(points)-3].Value.GetDoubleValue()) / 3)
+		}
 	}
 }

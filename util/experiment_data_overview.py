@@ -10,11 +10,12 @@ class Node:
         self.avg_resptime = 0.0
         self.avg_utilization = "not defined"
         self.max_utilization = "not defined"
+        self.top3_utilization = "not defined"
         self.response_times = dict()
         # self.related_nodes = set()
 
     def toString(self):
-        return self.name + ": " + self.instance_name + ", avg. response time: " + str(self.avg_resptime) + ", avg. utilization: " + self.avg_utilization + ", max utilization: " + self.max_utilization + ", response times: " + str(
+        return self.name + ": " + self.instance_name + ", avg. response time: " + str(self.avg_resptime) + ", top3 utilization: " + self.top3_utilization + ", avg. utilization: " + self.avg_utilization + ", max utilization: " + self.max_utilization + ", response times: " + str(
             self.response_times)  # + ", " + str(self.related_nodes)
 
     def setAvgUtil(self, util):
@@ -23,12 +24,16 @@ class Node:
     def setMaxUtil(self, util):
         self.max_utilization = util
 
+    def setTop3Util(self, util):
+        self.top3_utilization = util
+
 
 EXPERIMENT_PATH = sys.argv[1]
 DO_EXPORT = sys.argv[2].startswith("export=true")   # tells if script should export training data from spans
 UTIL_TS_PATTERN = re.compile('^Timeseries:.*key:\"instance_name\" value:\"([\w\-]+)\"\}.*$')
 UTIL_AVG_PATTERN = re.compile('^Average Utilization: ([\d\.]+)$')
 UTIL_MAX_PATTERN = re.compile('^Max Utilization: ([\d\.]+)$')
+UTIL_TOP3_PATTERN = re.compile('^Top3 Utilization: ([\d\.]+)$')
 CLIENT_POSTFIX = " CLIENT"
 
 # read files
@@ -60,6 +65,13 @@ for line in utilfile:
                     if node.name.startswith(service_name):
                         node.setMaxUtil(res3.group(1))
                         break
+            else:
+                res4 = UTIL_TOP3_PATTERN.match(line)
+                if res4:
+                    for node in nodes:
+                        if node.name.startswith(service_name):
+                            node.setTop3Util(res4.group(1))
+                            break
 
 zipkin_spans = pd.read_csv(EXPERIMENT_PATH + "/zipkin_spans.csv")
 zipkin_annotations = pd.read_csv(EXPERIMENT_PATH + "/zipkin_annotations.csv")
