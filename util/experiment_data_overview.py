@@ -30,7 +30,7 @@ class Node:
 
 EXPERIMENT_PATH = sys.argv[1]
 DO_EXPORT = sys.argv[2].startswith("export=true")   # tells if script should export training data from spans
-UTIL_TS_PATTERN = re.compile('^Timeseries:.*key:\"instance_name\" value:\"([\w\-]+)\"\}.*$')
+UTIL_TS_PATTERN = re.compile('^Timeseries:.*key:\"instance_name\"\s+value:\"([\w\-]+)\"\}.*')
 UTIL_AVG_PATTERN = re.compile('^Average Utilization: ([\d\.]+)$')
 UTIL_MAX_PATTERN = re.compile('^Max Utilization: ([\d\.]+)$')
 UTIL_TOP3_PATTERN = re.compile('^Top3 Utilization: ([\d\.]+)$')
