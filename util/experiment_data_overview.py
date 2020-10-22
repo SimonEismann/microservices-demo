@@ -15,7 +15,8 @@ class Node:
         # self.related_nodes = set()
 
     def toString(self):
-        return self.name + ": " + self.instance_name + ", avg. response time: " + str(self.avg_resptime) + ", top3 utilization: " + self.top3_utilization + ", avg. utilization: " + self.avg_utilization + ", max utilization: " + self.max_utilization + ", response times: " + str(
+        return self.name + ": " + self.instance_name + ", avg. response time: " + str(
+            self.avg_resptime) + ", top3 utilization: " + self.top3_utilization + ", avg. utilization: " + self.avg_utilization + ", max utilization: " + self.max_utilization + ", response times: " + str(
             self.response_times)  # + ", " + str(self.related_nodes)
 
     def setAvgUtil(self, util):
@@ -29,7 +30,7 @@ class Node:
 
 
 EXPERIMENT_PATH = sys.argv[1]
-DO_EXPORT = sys.argv[2].startswith("export=true")   # tells if script should export training data from spans
+DO_EXPORT = sys.argv[2].startswith("export=true")  # tells if script should export training data from spans
 UTIL_TS_PATTERN = re.compile('^Timeseries:.*key:\"instance_name\"\s+value:\"([\w\-]+)\"\}.*')
 UTIL_AVG_PATTERN = re.compile('^Average Utilization: ([\d\.]+)$')
 UTIL_MAX_PATTERN = re.compile('^Max Utilization: ([\d\.]+)$')
@@ -37,41 +38,25 @@ UTIL_TOP3_PATTERN = re.compile('^Top3 Utilization: ([\d\.]+)$')
 CLIENT_POSTFIX = " CLIENT"
 
 # read files
-nodemap = pd.read_csv(EXPERIMENT_PATH + "/nodemap.txt", header=None, names=["service", "instance"])
-utilfile = open(EXPERIMENT_PATH + "/util_results.txt")
+nodemap = pd.read_csv(EXPERIMENT_PATH + "/nodemap.txt", header=None, names=["service", "instance", "IP"])
+loadgen_file = pd.read_csv(EXPERIMENT_PATH + "/loadgen_result.csv")
 
 nodes = []
-service_name = ""
-for line in utilfile:
-    res = UTIL_TS_PATTERN.match(line)
-    if res:
-        for index, row in nodemap.iterrows():
-            if row["instance"] == res.group(1):
-                service_name = row["service"]
-                break
-        nodes.append(Node(service_name, res.group(1)))
-        nodes.append(Node(service_name + CLIENT_POSTFIX, res.group(1)))
-    else:
-        res2 = UTIL_AVG_PATTERN.match(line)
-        if res2:
-            for node in nodes:
-                if node.name.startswith(service_name):
-                    node.setAvgUtil(res2.group(1))
-                    break
-        else:
-            res3 = UTIL_MAX_PATTERN.match(line)
-            if res3:
-                for node in nodes:
-                    if node.name.startswith(service_name):
-                        node.setMaxUtil(res3.group(1))
-                        break
-            else:
-                res4 = UTIL_TOP3_PATTERN.match(line)
-                if res4:
-                    for node in nodes:
-                        if node.name.startswith(service_name):
-                            node.setTop3Util(res4.group(1))
-                            break
+columns = list(loadgen_file.columns.values)
+for index, row in nodemap.iterrows():
+    server_node = Node(row["service"], row["instance"])
+    client_node = Node(row["service"] + CLIENT_POSTFIX, row["instance"])
+    utils = None
+    for i in range(len(columns)):
+        if row["IP"] in columns[i]:
+            utils = loadgen_file[columns[i]].astype(float)
+            break
+    utils = sorted(utils)
+    server_node.avg_utilization = str(sum(utils) / len(utils))
+    server_node.max_utilization = str(utils[-1])
+    server_node.top3_utilization = str(sum(utils[-3:-1]) / 3)
+    nodes.append(server_node)
+    nodes.append(client_node)
 
 zipkin_spans = pd.read_csv(EXPERIMENT_PATH + "/zipkin_spans.csv")
 zipkin_annotations = pd.read_csv(EXPERIMENT_PATH + "/zipkin_annotations.csv")

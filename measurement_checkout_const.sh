@@ -1,6 +1,8 @@
 # usage: 	./measurement_checkout_const.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY
 # example: 	./measurement_checkout_const.sh experiments/checkout 300 20
 
+# Open port 22442 for all VM instances to external!
+
 EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
 LOAD_DURATION=$2 			# in seconds
 LOAD_INTENSITY=$3			# requests per second
@@ -9,7 +11,6 @@ rm -rf $EXPERIMENT_NAME
 mkdir -p $EXPERIMENT_NAME/training_data
 
 USER_AMOUNT=$(($LOAD_DURATION * $LOAD_INTENSITY))
-UTIL_FILE_PATH="${EXPERIMENT_NAME}/util_results.txt"
 USER_ID_FILE="${EXPERIMENT_NAME}/userids.txt"
 LOAD="${EXPERIMENT_NAME}/load.csv"
 LOAD_SCRIPT="${EXPERIMENT_NAME}/load.lua"
@@ -25,12 +26,17 @@ services=(adservice cartservice checkoutservice currencyservice emailservice fro
 gcloud container clusters create $CLUSTER_NAME --min-nodes=${#services[@]} --max-nodes=${#services[@]} --num-nodes=${#services[@]} --zone $ZONE --machine-type=${MACHINE_TYPE} --no-enable-autoupgrade
 nodes_string=`kubectl get nodes | grep -vP '^NAME' | grep -oP '^[\w\-0-9]+'`
 readarray -t nodes <<< "$nodes_string"
+IP_LIST=()
 rm -f $NODE_MAP
 touch $NODE_MAP
 for index in "${!services[@]}"
 do 
-	kubectl label nodes ${nodes[index]} service=${services[index]}
-	printf "${services[index]},${nodes[index]}\n" >> $NODE_MAP
+	kubectl label nodes ${nodes[index]} service=${services[index]}	# label the nodes to specific services
+	gcloud compute scp util/lmdaemon ${nodes[index]}:~ --zone=$ZONE --quiet	# copy and start our utilization measurement tool, port: 22442
+	gcloud compute ssh ${nodes[index]} --zone=$ZONE --quiet --command="chmod +x lmdaemon; nohup ~/lmdaemon > /dev/null 2>&1 &; ps"
+	NODE_IP="$(gcloud compute instances describe ${nodes[index]} --format='get(networkInterfaces[0].accessConfigs[0].natIP)')"
+	IP_LIST+=($NODE_IP)
+	printf "${services[index]},${nodes[index]},${NODE_IP}\n" >> $NODE_MAP
 done
 kubectl apply -f ./kubernetes-manifests-checkout-only	# deploys specially prepared delays
 kubectl get pods -o wide	# show deployment of pods for verification
@@ -65,12 +71,11 @@ touch $LOAD_SCRIPT
 printf "frontendIP = \"http://${FRONTEND_ADDR}\"\nfunction onCycle(id_new_user)\n\tuserId = id_new_user\nend\nfunction frontend_cart_checkout(user_id)\n\treturn \"[POST]{user_id=\"..user_id..\"&email=someone%%40example.com&street_address=1600+Amphitheatre+Parkway&zip_code=94043&city=Mountain+View&state=CA&country=United+States&credit_card_number=4432-8015-6152-0454&credit_card_expiration_month=1&credit_card_expiration_year=2021&credit_card_cvv=672}\"..frontendIP..\"/cart/checkout\"\nend\nfunction onCall(callnum)\n\tif (callnum == 1) then\n\t\treturn frontend_cart_checkout(userId)\n\telse\n\t\treturn nil\n\tend\nend" > $LOAD_SCRIPT
 echo "starting load generator..."
 pkill -f 'java -jar'
-java -jar src/loadgenerator/httploadgenerator.jar loadgenerator --user-id-file $USER_ID_FILE & java -jar src/loadgenerator/httploadgenerator.jar director --ip localhost --load $LOAD -o $LOAD_RESULT --lua $LOAD_SCRIPT -t 300 --timeout=10000 > ${EXPERIMENT_NAME}/loaddriverlogs.txt
+LMDAEMON_PORT="22442"
+IP_STRING=""
+for ip in "${IP_LIST[@]}"; do IP_STRING+="${ip}:${LMDAEMON_PORT}," ; done
+java -jar src/loadgenerator/httploadgenerator.jar loadgenerator --user-id-file $USER_ID_FILE & java -cp util/load.jar:src/loadgenerator/httploadgenerator.jar tools.descartes.dlim.httploadgenerator.runner.Main director --ip localhost --load $LOAD -o $LOAD_RESULT --lua $LOAD_SCRIPT -t 300 -p="${IP_STRING::${#IP_STRING}-1}" -c measurment.ProcListener --timeout=10000 > ${EXPERIMENT_NAME}/loaddriverlogs.txt
 pkill -f 'java -jar'
-echo "saving stackdriver utilization logs to ${UTIL_FILE_PATH}"
-cd util/utilization-exporter
-go run exporter.go $PROJECT_ID $(($LOAD_DURATION + 10)) > ../../$UTIL_FILE_PATH
-cd ../..
 echo "wait 2 minutes for zipkin data to settle..."
 sleep 120
 echo "save MySQL dump to csv..."
