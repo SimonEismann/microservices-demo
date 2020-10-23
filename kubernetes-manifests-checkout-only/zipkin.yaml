@@ -29,8 +29,7 @@ spec:
           value: mysql
         - name: MYSQL_HOST
           value: mysql
-        image: openzipkin/zipkin
-        imagePullPolicy: Always
+        image: openzipkin/zipkin:2.21.7
         name: zipkin
         ports:
         - containerPort: 9411
