@@ -33,8 +33,8 @@ for index in "${!services[@]}"
 do 
 	kubectl label nodes ${nodes[index]} service=${services[index]}	# label the nodes to specific services
 	gcloud compute scp util/lmdaemon ${nodes[index]}:~ --zone=$ZONE --quiet	# copy and start our utilization measurement tool, port: 22442
-	gcloud compute ssh ${nodes[index]} --zone=$ZONE --quiet --command="chmod +x lmdaemon; nohup ~/lmdaemon > /dev/null 2>&1 &; ps"
-	NODE_IP="$(gcloud compute instances describe ${nodes[index]} --format='get(networkInterfaces[0].accessConfigs[0].natIP)')"
+	gcloud compute ssh ${nodes[index]} --zone=$ZONE --quiet --command="chmod +x lmdaemon; nohup ~/lmdaemon > /dev/null 2>&1 &"
+	NODE_IP="$(gcloud compute instances describe ${nodes[index]} --zone=${ZONE} --format='get(networkInterfaces[0].accessConfigs[0].natIP)')"
 	IP_LIST+=($NODE_IP)
 	printf "${services[index]},${nodes[index]},${NODE_IP}\n" >> $NODE_MAP
 done
