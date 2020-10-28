@@ -134,12 +134,6 @@ func (cs *cartService) ConnectToRedis(c context.Context) *redis.Client {
 		DB:       0,  // use default DB
 		MaxRetries: 5, // like in the c# implementation
 	})
-	pong, err := rdb.Ping(c).Result()
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Info(pong)
-	}
 	return rdb
 }
 
