@@ -36,6 +36,14 @@ UTIL_AVG_PATTERN = re.compile('^Average Utilization: ([\d\.]+)$')
 UTIL_MAX_PATTERN = re.compile('^Max Utilization: ([\d\.]+)$')
 UTIL_TOP3_PATTERN = re.compile('^Top3 Utilization: ([\d\.]+)$')
 CLIENT_POSTFIX = " CLIENT"
+UTIL_THRESH = 0.05      # utils <= than this are ignored, no filter if negative
+
+def accUtil(util):
+    if UTIL_THRESH <= 0:
+        return True
+    if util < UTIL_THRESH:
+        return False
+    return True
 
 # read files
 nodemap = pd.read_csv(EXPERIMENT_PATH + "/nodemap.txt", header=None, names=["service", "instance", "IP"])
@@ -51,10 +59,11 @@ for index, row in nodemap.iterrows():
         if row["IP"] in columns[i]:
             utils = loadgen_file[columns[i]].astype(float)
             break
+    utils = [u for u in utils if accUtil(u)]
     utils = sorted(utils)
     server_node.avg_utilization = str(sum(utils) / len(utils))
     server_node.max_utilization = str(utils[-1])
-    server_node.top3_utilization = str(sum(utils[-3:-1]) / 3)
+    server_node.top3_utilization = str(sum(utils[-3:]) / 3)
     nodes.append(server_node)
     nodes.append(client_node)
 
