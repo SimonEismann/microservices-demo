@@ -32,8 +32,8 @@ touch $NODE_MAP
 for index in "${!services[@]}"
 do 
 	kubectl label nodes ${nodes[index]} service=${services[index]}	# label the nodes to specific services
-	gcloud compute scp util/lmdaemon ${nodes[index]}:~ --zone=$ZONE --quiet	# copy and start our utilization measurement tool, port: 22442
-	gcloud compute ssh ${nodes[index]} --zone=$ZONE --quiet --command="chmod +x lmdaemon; sudo mount -o remount,rw,exec /home; nohup ~/lmdaemon > /dev/null 2>&1 &"
+	gcloud compute scp util/utilization-servlet/utilization-servlet ${nodes[index]}:~ --zone=$ZONE --quiet	# copy and start our utilization measurement tool, port: 22442
+	gcloud compute ssh ${nodes[index]} --zone=$ZONE --quiet --command="chmod +x utilization-servlet; sudo mount -o remount,rw,exec /home; nohup ~/utilization-servlet > /dev/null 2>&1 &"
 	NODE_IP="$(gcloud compute instances describe ${nodes[index]} --zone=${ZONE} --format='get(networkInterfaces[0].accessConfigs[0].natIP)')"
 	IP_LIST+=($NODE_IP)
 	printf "${services[index]},${nodes[index]},${NODE_IP}\n" >> $NODE_MAP
@@ -74,7 +74,7 @@ pkill -f 'java -jar'
 LMDAEMON_PORT="22442"
 IP_STRING=""
 for ip in "${IP_LIST[@]}"; do IP_STRING+="${ip}:${LMDAEMON_PORT}," ; done
-java -jar src/loadgenerator/httploadgenerator.jar loadgenerator --user-id-file $USER_ID_FILE & java -cp util/load.jar:src/loadgenerator/httploadgenerator.jar tools.descartes.dlim.httploadgenerator.runner.Main director --ip localhost --load $LOAD -o $LOAD_RESULT --lua $LOAD_SCRIPT -t 300 -p="${IP_STRING::${#IP_STRING}-1}" -c measurment.ProcListener --timeout=10000 > ${EXPERIMENT_NAME}/loaddriverlogs.txt
+java -jar src/loadgenerator/httploadgenerator.jar loadgenerator --user-id-file $USER_ID_FILE & java -jar src/loadgenerator/httploadgenerator.jar director --ip localhost --load $LOAD -o $LOAD_RESULT --lua $LOAD_SCRIPT -t 300 -p="${IP_STRING::${#IP_STRING}-1}" --timeout=10000 > ${EXPERIMENT_NAME}/loaddriverlogs.txt
 pkill -f 'java -jar'
 echo "wait 2 minutes for zipkin data to settle..."
 sleep 120
