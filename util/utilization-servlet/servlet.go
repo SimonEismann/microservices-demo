@@ -68,7 +68,7 @@ func main() {
 		c, err := l.Accept()
 		if err != nil {
 			fmt.Println(err)
-			return
+			continue
 		}
 		go handleConnection(c)
 	}
@@ -79,12 +79,13 @@ func handleConnection(c net.Conn) {
 		_, err := bufio.NewReader(c).ReadString('\n')	// waits to receive a line
 		if err != nil {
 			fmt.Println(err)
-			return
+			break
 		}
 
 		_, err = c.Write([]byte(strconv.FormatFloat(currentUtil, 'f', -1, 64) + "\n")) // string to ASCII, write util to socket
 		if err != nil {
 			fmt.Println(err)
+			break
 		}
 	}
 	err := c.Close()

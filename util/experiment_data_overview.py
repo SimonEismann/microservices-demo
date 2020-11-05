@@ -36,7 +36,7 @@ UTIL_AVG_PATTERN = re.compile('^Average Utilization: ([\d\.]+)$')
 UTIL_MAX_PATTERN = re.compile('^Max Utilization: ([\d\.]+)$')
 UTIL_TOP3_PATTERN = re.compile('^Top3 Utilization: ([\d\.]+)$')
 CLIENT_POSTFIX = " CLIENT"
-UTIL_THRESH = 0.05      # utils <= than this are ignored, no filter if negative
+UTIL_THRESH = 0.03      # utils <= than this are ignored, no filter if negative
 
 def accUtil(util):
     if UTIL_THRESH <= 0:
