@@ -25,7 +25,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "github.com/SimonEismann/microservices-demo/src/checkoutservice/genproto"
+	pb "github.com/SimonEismann/microservices-demo/tree/master/src/adservice/genproto"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
