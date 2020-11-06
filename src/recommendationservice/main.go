@@ -25,14 +25,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "github.com/SimonEismann/microservices-demo/src/checkoutservice/genproto"
+	pb "github.com/SimonEismann/microservices-demo/src/recommendationservice/genproto"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
-)
-
-const (
-	listenPort       = "9555"
-	metricsPort      = "9556"
-	healthListenPort = "9557"
 )
 
 var log *logrus.Logger
@@ -71,21 +65,20 @@ func createMatrix(size int) *mat.Dense {
 	return a
 }
 
-type adService struct {
-	ads         []*pb.Ad
-	getAdsDelay	int64
+type recommendationService struct {
+	listRecommsDelay	int64
 }
 
 func main() {
 	go initTracing()
 
-	port := listenPort
+	port := "8080"
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")
 	}
 
-	svc := new(adService)
-	mustMapEnvInt64(&svc.getAdsDelay, "DELAY_GETADS")
+	svc := new(recommendationService)
+	mustMapEnvInt64(&svc.listRecommsDelay, "DELAY_LIST_RECOMMS")
 	log.Infof("service config: %+v", svc)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
@@ -93,25 +86,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// start metrics endpoint
-	go initPrometheusStats()
-
 	go initHealthServer()
 
-	err = svc.loadAdsFile()
-	if err != nil {
-		log.Fatalf("error parsing Ads json file %s", err)
-	}
-
 	srv := grpc.NewServer(grpc.StatsHandler(&ocgrpc.ServerHandler{}))
-	pb.RegisterAdServiceServer(srv, svc)
+	pb.RegisterRecommendationServiceServer(srv, svc)
 	log.Infof("starting to listen on tcp: %q", lis.Addr().String())
 	err = srv.Serve(lis)
 	log.Fatal(err)
 }
 
 func initHealthServer() {
-	port := healthListenPort
+	port := "8081"
 	if os.Getenv("HEALTH_PORT") != "" {
 		port = os.Getenv("HEALTH_PORT")
 	}
@@ -120,7 +105,7 @@ func initHealthServer() {
 		log.Fatal(err)
 	}
 	srv := grpc.NewServer()
-	healthpb.RegisterHealthServer(srv, new(adService))
+	healthpb.RegisterHealthServer(srv, new(recommendationService))
 	log.Infof("starting to listen on tcp: %q", lis.Addr().String())
 	err = srv.Serve(lis)
 	log.Fatal(err)
@@ -168,38 +153,6 @@ func initZipkinTracing() {
 	log.Info("zipkin initialization completed.")
 }
 
-func initPrometheusStats() {
-	// init the prometheus /metrics endpoint
-	exporter, err := prometheus.NewExporter(prometheus.Options{})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// register basic views
-	initStats(exporter)
-
-	metricsURL := fmt.Sprintf(":%s", metricsPort)
-	http.Handle("/metrics", exporter)
-
-	log.Infof("starting HTTP server at %s", metricsURL)
-	log.Fatal(http.ListenAndServe(metricsURL, nil))
-}
-
-func initStats(exporter *prometheus.Exporter) {
-	view.SetReportingPeriod(60 * time.Second)
-	view.RegisterExporter(exporter)
-	if err := view.Register(ocgrpc.DefaultServerViews...); err != nil {
-		log.Warn("Error registering default server views")
-	} else {
-		log.Info("Registered default server views")
-	}
-	if err := view.Register(ocgrpc.DefaultClientViews...); err != nil {
-		log.Warn("Error registering default client views")
-	} else {
-		log.Info("Registered default client views")
-	}
-}
-
 func initTracing() {
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 	initJaegerTracing()
@@ -218,32 +171,10 @@ func mustMapEnvInt64(target *int64, envKey string) {
 	}
 }
 
-func (a *adService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
+func (a *recommendationService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
 	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
 }
 
-func (a *adService) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_WatchServer) error {
+func (a *recommendationService) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_WatchServer) error {
 	return status.Errorf(codes.Unimplemented, "health check via Watch not implemented")
-}
-
-func (a *adService) loadAdsFile() error {
-	data, err := ioutil.ReadFile("ads.json")
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(data, &a.ads)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("found %d ads\n", len(a.ads))
-
-	return nil
-}
-
-func (a *adService) GetAds(ctx context.Context, req *pb.AdRequest) (*pb.AdResponse, error) {
-	passTime(a.getAdsDelay)
-	log.Infof("[GetAds] contextKeys=%q", req.ContextKeys)
-
-	resp := &pb.AdResponse{Ads: a.ads}
-	return resp, nil
 }

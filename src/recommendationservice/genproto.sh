@@ -14,12 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/bin/bash
-set -e
+#!/bin/bash -e
 
-# script to compile python protos
-#
-# requires gRPC tools:
-#   pip install -r requirements.txt
+PATH=$PATH:$GOPATH/bin
+protodir=../../pb
 
-python -m grpc_tools.protoc -I../../pb --python_out=. --grpc_python_out=. ../../pb/demo.proto
+protoc --go_out=plugins=grpc:genproto -I $protodir $protodir/demo.proto

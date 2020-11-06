@@ -16,4 +16,7 @@
 
 #!/bin/bash -e
 
-python -m grpc_tools.protoc -I../../pb --python_out=. --grpc_python_out=. ../../pb/demo.proto
+PATH=$PATH:$GOPATH/bin
+protodir=../../pb
+
+protoc --go_out=plugins=grpc:genproto -I $protodir $protodir/demo.proto
