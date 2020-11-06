@@ -1,10 +1,10 @@
-module github.com/SimonEismann/microservices-demo/tree/master/src/adservice
+module github.com/SimonEismann/microservices-demo/tree/master/src/recommendationservice
 
 go 1.13
 
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.0
-	contrib.go.opencensus.io/exporter/prometheus v0.1.0
+	contrib.go.opencensus.io/exporter/prometheus v0.1.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.1
 	github.com/GoogleCloudPlatform/microservices-demo v0.2.0 // indirect
 	github.com/golang/protobuf v1.3.2

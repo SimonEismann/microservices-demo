@@ -20,7 +20,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "github.com/SimonEismann/microservices-demo/src/emailservice/genproto"
+	pb "github.com/SimonEismann/microservices-demo/tree/master/src/emailservice/genproto"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
@@ -124,7 +124,7 @@ func initJaegerTracing() {
 	exporter, err := jaeger.NewExporter(jaeger.Options{
 		Endpoint: fmt.Sprintf("http://%s", svcAddr),
 		Process: jaeger.Process{
-			ServiceName: "adservice",
+			ServiceName: "emailservice",
 		},
 	})
 	if err != nil {
@@ -143,7 +143,7 @@ func initZipkinTracing() {
 		return
 	}
 
-	endpoint, err := openzipkin.NewEndpoint("adservice", "")
+	endpoint, err := openzipkin.NewEndpoint("emailservice", "")
 	if err != nil {
 		log.Fatalf("unable to create local endpoint: %+v\n", err)
 	}

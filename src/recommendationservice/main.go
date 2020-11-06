@@ -2,32 +2,30 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"math/rand"
 	"net"
-	"net/http"
 	"os"
 	"strconv"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
-	"contrib.go.opencensus.io/exporter/prometheus"
 	"contrib.go.opencensus.io/exporter/zipkin"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/plugin/ocgrpc"
-	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 	"gonum.org/v1/gonum/mat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "github.com/SimonEismann/microservices-demo/src/recommendationservice/genproto"
+	pb "github.com/SimonEismann/microservices-demo/tree/master/src/recommendationservice/genproto"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
+
+const MaxRecomms = 5
 
 var log *logrus.Logger
 
@@ -67,6 +65,60 @@ func createMatrix(size int) *mat.Dense {
 
 type recommendationService struct {
 	listRecommsDelay	int64
+	prodcatserviceAddr	string
+}
+
+func (a *recommendationService) GetProductList(ctx context.Context) (*[]string, error) {
+	conn, err := grpc.DialContext(ctx, a.prodcatserviceAddr,
+		grpc.WithInsecure(),
+		grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+	if err != nil {
+		return nil, fmt.Errorf("could not connect product service: %+v", err)
+	}
+	defer conn.Close()
+
+	prodList, err := pb.NewProductCatalogServiceClient(conn).ListProducts(ctx, new(pb.Empty))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get product list: %+v", err)
+	}
+	var products []string
+	for i := 0; i < len(prodList.Products); i++ {
+		products = append(products, prodList.Products[i].Id)
+	}
+	return &products, nil
+}
+
+
+func (a *recommendationService) ListRecommendations(c context.Context, request *pb.ListRecommendationsRequest) (*pb.ListRecommendationsResponse, error) {
+	passTime(a.listRecommsDelay)
+	prodList, err := a.GetProductList(c)
+	if err != nil {
+		return nil, err
+	}
+	var res []string
+	for i := 0; i < len(*prodList); i++ {
+		pid := (*prodList)[i]
+		found := false
+		for rpid := range request.ProductIds {
+			if pid == request.ProductIds[rpid] {
+				found = true
+				break
+			}
+		}
+		if !found {
+			res = append(res, pid)
+		}
+	}
+	rand.Shuffle(len(res), func(i, j int) { res[i], res[j] = res[j], res[i] })
+	return &pb.ListRecommendationsResponse{ProductIds: res[:min(len(res), MaxRecomms)]}, nil
+}
+
+func min(n1 int, n2 int) int {
+	if n1 < n2 {
+		return n1
+	} else {
+		return n2
+	}
 }
 
 func main() {
@@ -79,6 +131,7 @@ func main() {
 
 	svc := new(recommendationService)
 	mustMapEnvInt64(&svc.listRecommsDelay, "DELAY_LIST_RECOMMS")
+	mustMapEnv(&svc.prodcatserviceAddr, "PRODUCT_CATALOG_SERVICE_ADDR")
 	log.Infof("service config: %+v", svc)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
@@ -123,7 +176,7 @@ func initJaegerTracing() {
 	exporter, err := jaeger.NewExporter(jaeger.Options{
 		Endpoint: fmt.Sprintf("http://%s", svcAddr),
 		Process: jaeger.Process{
-			ServiceName: "adservice",
+			ServiceName: "recommendationservice",
 		},
 	})
 	if err != nil {
@@ -142,7 +195,7 @@ func initZipkinTracing() {
 		return
 	}
 
-	endpoint, err := openzipkin.NewEndpoint("adservice", "")
+	endpoint, err := openzipkin.NewEndpoint("recommendationservice", "")
 	if err != nil {
 		log.Fatalf("unable to create local endpoint: %+v\n", err)
 	}
@@ -169,6 +222,14 @@ func mustMapEnvInt64(target *int64, envKey string) {
 	} else {
 		panic(fmt.Sprintf("environment variable %q not an int64", envKey))
 	}
+}
+
+func mustMapEnv(target *string, envKey string) {
+	v := os.Getenv(envKey)
+	if v == "" {
+		panic(fmt.Sprintf("environment variable %q not set", envKey))
+	}
+	*target = v
 }
 
 func (a *recommendationService) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {

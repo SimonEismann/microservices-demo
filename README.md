@@ -2,7 +2,7 @@
 This repo is a fork of Tetrate's modified version of the GCP Hipstershop/Online Boutique with modifications to allow for in-depth Zipkin tracing. Changes include:
 - Native 100% tracing of every service with Zipkin with respect to parent and child spans.
 - Deployment with pre-built Zipkin and MySQL instances to allow for fast data generation and extraction.
-- Rewrite of `adservice`, `cartservice`, `currencyservice` and `paymentservice` in Go. Usage of another [loadgenerator](https://github.com/SimonEismann/HTTP-Load-Generator).
+- Rewrite of `adservice`, `cartservice`, `currencyservice`, `emailservice`, `paymentservice` and `recommendationservice` in Go. Usage of another [loadgenerator](https://github.com/SimonEismann/HTTP-Load-Generator).
 - Lots of smaller fixes.
 - Ready to use deployment and data extraction scripts. All services are deployed to separate nodes.
 - Artificial delays (constant workload) with matrix multiplication for all microservices.
@@ -15,7 +15,7 @@ Here is our (slightly) updated and more detailed service architecture, which als
 
 # Artificial Delays
 Artificial delays can be activated by setting the `DELAY_*` environment variables in the `.yaml` deployment files in the `kubernetes-manifests` folder. The variables (64-bit signed) have to be set to positive integers to activate the feature.
-The delay variable describes the amount of matrix (random values, constant size) multiplications computed before the actual task. The table below shows some measurements from an example experiment (low utilization, on n1-standard-1 nodes), where python services need much higher DELAY_* values to achieve the same time delay:
+The delay variable describes the amount of matrix (random values, constant size) multiplications computed before the actual task. The table below shows some measurements from an example experiment (low utilization, on n1-standard-1 nodes):
 
 | DELAY [#matrix multiplications] | Delay [ms] | TIME / MM   | Service               |
 |---------------------------------|------------|-------------|-----------------------|
