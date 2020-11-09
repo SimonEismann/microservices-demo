@@ -88,11 +88,11 @@ python3 util/experiment_data_overview.py $EXPERIMENT_NAME export=true > $OVERVIE
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data cartservice.csv hipstershop.cartservice.emptycart.csv,hipstershop.cartservice.getcart.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data checkoutservice.csv hipstershop.checkoutservice.placeorder.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data currencyservice.csv hipstershop.currencyservice.convert.csv
-python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data emailservice.csv recv.hipstershop.emailservice.sendorderconfirmation.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data emailservice.csv hipstershop.emailservice.sendorderconfirmation.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data frontend.csv cartcheckout.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data paymentservice.csv hipstershop.paymentservice.charge.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data productcatalogservice.csv hipstershop.productcatalogservice.getproduct.csv,hipstershop.productcatalogservice.listproducts.csv
-python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data recommendationservice.csv recv.hipstershop.recommendationservice.listrecommendations.csv
+python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data recommendationservice.csv hipstershop.recommendationservice.listrecommendations.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data shippingservice.csv hipstershop.shippingservice.shiporder.csv,hipstershop.shippingservice.getquote.csv
 echo "finished measurement successfully! All data can be found in ${EXPERIMENT_NAME}."
 gcloud container clusters delete $CLUSTER_NAME --zone=$ZONE --quiet
