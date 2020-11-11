@@ -73,5 +73,6 @@ sudo apt-get install mariadb-client
 sudo apt-get install python3
 sudo apt-get install golang-go
 pip3 install pandas
+pip3 install openpyxl
 ```
 Additionally, the firewall for all VMs should be configured to allow incoming connections on port `22442`. Some usage examples are given in the shell files themselves.
