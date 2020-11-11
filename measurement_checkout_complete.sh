@@ -13,5 +13,5 @@ do
 	done
 done
 cd experiments
-python3 util/overview_to_table.py > table.txt
+python3 ../util/overview_to_table.py > table_log.txt
 cd ..
