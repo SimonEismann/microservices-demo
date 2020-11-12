@@ -2,7 +2,7 @@ import re
 import pandas
 
 RUNS = [1, 2, 3]
-LOADS = [5, 10, 15, 20, 25, 30, 35]
+LOADS = [5, 10, 15, 20, 25, 30]
 
 PATTERN = re.compile("^(\w+):.+avg\. response time: ([\d\.]+),.*avg\. utilization: ([\d\.]+),.*")
 
@@ -11,10 +11,12 @@ CORE_COUNT = 4
 
 df_util = None
 df_rt = None
+df_sdl = None
 
 for load in LOADS:
     service_dict_util = dict()
     service_dict_rt = dict()
+    service_dict_sdl = dict()
     for run in RUNS:
         file = open("checkout-" + str(run) + "-" + str(load) + "/overview.txt")
         for line in file:
@@ -33,7 +35,8 @@ for load in LOADS:
                 service_dict_rt[service_name].append(avg_rt)
     for k, v in service_dict_util.items():
         print(str(load) + ": " + k + ": " + str(v))
-        sdl = sum(v) / len(v) / load
+        avg_util = sum(v) / len(v)
+        sdl =  avg_util / load
         if k == "cartservice":
             sdl = sdl / 2
             print("cartservice triggered")
@@ -46,7 +49,8 @@ for load in LOADS:
         elif k == "shippingservice":
             sdl = sdl / 2
             print("shippingservice triggered")
-        service_dict_util[k] = sdl
+        service_dict_util[k] = avg_util
+        service_dict_sdl[k] = sdl
     for k, v in service_dict_rt.items():
         avg_rt = sum(v) / len(v)
         service_dict_rt[k] = avg_rt
@@ -54,6 +58,10 @@ for load in LOADS:
         df_util = pandas.DataFrame(data=service_dict_util, index=[load])
     else:
         df_util = df_util.append(pandas.DataFrame(service_dict_util, index=[load]))
+    if df_sdl is None:
+        df_sdl = pandas.DataFrame(data=service_dict_sdl, index=[load])
+    else:
+        df_sdl = df_sdl.append(pandas.DataFrame(service_dict_sdl, index=[load]))
     if df_rt is None:
         df_rt = pandas.DataFrame(data=service_dict_rt, index=[load])
     else:
@@ -65,8 +73,10 @@ for column in df_util:
 df_util = df_util.append(pandas.DataFrame(data=[means], index=["SDL of MEAN"], columns=df_util.columns))
 
 with pandas.ExcelWriter('overview_table.xlsx') as writer:
-    df_util.to_excel(writer, sheet_name='SDL Values')
+    df_util.to_excel(writer, sheet_name='Utilizations')
+    df_sdl.to_excel(writer, sheet_name='SDL Values')
     df_rt.to_excel(writer, sheet_name='Response Times')
 
 print(df_util)
+print(df_sdl)
 print(df_rt)

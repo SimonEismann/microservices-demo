@@ -1,9 +1,9 @@
 chmod +x measurement_checkout_var.sh
 chmod +x measurement_checkout_const.sh
 RUNS=(1 2 3)
-LOADS=(5 10 15 20 25 30 35)
+LOADS=(5 10 15 20 25 30)
 DURATION=600
-./measurement_checkout_var.sh experiments/checkout-var $DURATION 35
+./measurement_checkout_var.sh experiments/checkout-var $DURATION 30
 for RUN in "${RUNS[@]}"
 do
 	for LOAD in "${LOADS[@]}"

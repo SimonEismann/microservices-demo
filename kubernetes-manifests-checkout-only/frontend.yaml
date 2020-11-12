@@ -58,7 +58,7 @@ spec:
         - name: DELAY_CART_EMPTY
           value: "0"
         - name: DELAY_CHECKOUT
-          value: "180"
+          value: "270"
         - name: DELAY_SET_CURRENCY
           value: "0"
         - name: DELAY_LOGOUT
