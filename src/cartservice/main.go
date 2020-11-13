@@ -18,21 +18,18 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
-	"contrib.go.opencensus.io/exporter/prometheus"
 	"contrib.go.opencensus.io/exporter/zipkin"
 	"github.com/go-redis/redis/v8"
 	openzipkin "github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/plugin/ocgrpc"
-	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 	"gonum.org/v1/gonum/mat"
 	"google.golang.org/grpc"
@@ -45,7 +42,6 @@ import (
 
 const (
 	listenPort       = "7070"
-	metricsPort      = "7071"
 	healthListenPort = "7072"
 )
 
@@ -125,6 +121,7 @@ type cartService struct {
 	addItemDelay int64
 	getCartDelay int64
 	emptyCartDelay int64
+	isDummy bool
 }
 
 func (cs *cartService) ConnectToRedis(c context.Context) *redis.Client {
@@ -139,49 +136,58 @@ func (cs *cartService) ConnectToRedis(c context.Context) *redis.Client {
 
 func (cs *cartService) AddItem(c context.Context, request *pb.AddItemRequest) (*pb.Empty, error) {
 	passTime(cs.addItemDelay)
-	rdb := cs.ConnectToRedis(c)
-	val, err := rdb.Get(c, request.UserId).Result()		// redis maps keys (userId) to value (cart items as string)
-	cart := pb.Cart{UserId: request.UserId}
-	if err == redis.Nil {
-		log.Info("cart for " + request.UserId + "does not exist")
-		cart.Items = []*pb.CartItem{}
-	} else if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Info("Cart retrieved: " + val)
-		cart.Items = *cartItemsFromString(&val)
-	}
-	foundExisting := false
-	for _, item := range cart.Items {
-		if item.ProductId == request.Item.ProductId {
-			foundExisting = true
-			item.Quantity += request.Item.Quantity
-			break
+	if !cs.isDummy {
+		rdb := cs.ConnectToRedis(c)
+		val, err := rdb.Get(c, request.UserId).Result()		// redis maps keys (userId) to value (cart items as string)
+		cart := pb.Cart{UserId: request.UserId}
+		if err == redis.Nil {
+			log.Info("cart for " + request.UserId + "does not exist")
+			cart.Items = []*pb.CartItem{}
+		} else if err != nil {
+			log.Fatal(err)
+		} else {
+			log.Info("Cart retrieved: " + val)
+			cart.Items = *cartItemsFromString(&val)
 		}
-	}
-	if !foundExisting {
-		cart.Items = append(cart.Items, request.Item)
-	}
-	err2 := rdb.Set(c, request.UserId, *cartItemsToString(&cart.Items), 0).Err()
-	if err2 != nil {
-		log.Fatal(err2)
+		foundExisting := false
+		for _, item := range cart.Items {
+			if item.ProductId == request.Item.ProductId {
+				foundExisting = true
+				item.Quantity += request.Item.Quantity
+				break
+			}
+		}
+		if !foundExisting {
+			cart.Items = append(cart.Items, request.Item)
+		}
+		err2 := rdb.Set(c, request.UserId, *cartItemsToString(&cart.Items), 0).Err()
+		if err2 != nil {
+			log.Fatal(err2)
+		}
 	}
 	return &pb.Empty{}, nil
 }
 
 func (cs *cartService) GetCart(c context.Context, request *pb.GetCartRequest) (*pb.Cart, error) {
 	passTime(cs.getCartDelay)
-	rdb := cs.ConnectToRedis(c)
-	val, err := rdb.Get(c, request.UserId).Result()		// redis maps keys (userId) to value (cart items as string)
 	cart := pb.Cart{UserId: request.UserId}
-	if err == redis.Nil {
-		log.Info("cart for " + request.UserId + " does not exist")
-		cart.Items = []*pb.CartItem{}
-	} else if err != nil {
-		log.Fatal(err)
+	if cs.isDummy {
+		cart.Items = []*pb.CartItem{{
+			ProductId: "0PUK6V6EV0",
+			Quantity:  1,
+				}}
 	} else {
-		log.Info("Cart retrieved: " + val)
-		cart.Items = *cartItemsFromString(&val)
+		rdb := cs.ConnectToRedis(c)
+		val, err := rdb.Get(c, request.UserId).Result()		// redis maps keys (userId) to value (cart items as string)
+		if err == redis.Nil {
+			log.Info("cart for " + request.UserId + " does not exist")
+			cart.Items = []*pb.CartItem{}
+		} else if err != nil {
+			log.Fatal(err)
+		} else {
+			log.Info("Cart retrieved: " + val)
+			cart.Items = *cartItemsFromString(&val)
+		}
 	}
 	return &cart, nil
 }
@@ -189,10 +195,12 @@ func (cs *cartService) GetCart(c context.Context, request *pb.GetCartRequest) (*
 // Deletes cart from redis for specific userId
 func (cs *cartService) EmptyCart(c context.Context, request *pb.EmptyCartRequest) (*pb.Empty, error) {
 	passTime(cs.emptyCartDelay)
-	rdb := cs.ConnectToRedis(c)
-	err := rdb.Del(c, request.UserId).Err()
-	if err != nil {
-		log.Fatal(err)
+	if !cs.isDummy {
+		rdb := cs.ConnectToRedis(c)
+		err := rdb.Del(c, request.UserId).Err()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	return &pb.Empty{}, nil
 }
@@ -204,6 +212,7 @@ func main() {
 		port = os.Getenv("PORT")
 	}
 	svc := new(cartService)
+	svc.isDummy = os.Getenv("DUMMY") != ""
 	mustMapEnv(&svc.redisSvcAddr, "REDIS_ADDR")
 	mustMapEnvInt64(&svc.addItemDelay, "DELAY_ADD_ITEM")
 	mustMapEnvInt64(&svc.getCartDelay, "DELAY_GET_CART")
@@ -213,7 +222,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	go initPrometheusStats()
 	go initHealthServer()
 	srv := grpc.NewServer(grpc.StatsHandler(&ocgrpc.ServerHandler{}))
 	pb.RegisterCartServiceServer(srv, svc)
@@ -271,33 +279,6 @@ func initZipkinTracing() {
 	exporter := zipkin.NewExporter(reporter, endpoint)
 	trace.RegisterExporter(exporter)
 	log.Info("zipkin initialization completed.")
-}
-
-func initPrometheusStats() {
-	exporter, err := prometheus.NewExporter(prometheus.Options{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	initStats(exporter)
-	metricsURL := fmt.Sprintf(":%s", metricsPort)
-	http.Handle("/metrics", exporter)
-	log.Infof("starting HTTP server at %s", metricsURL)
-	log.Fatal(http.ListenAndServe(metricsURL, nil))
-}
-
-func initStats(exporter *prometheus.Exporter) {
-	view.SetReportingPeriod(60 * time.Second)
-	view.RegisterExporter(exporter)
-	if err := view.Register(ocgrpc.DefaultServerViews...); err != nil {
-		log.Warn("Error registering default server views")
-	} else {
-		log.Info("Registered default server views")
-	}
-	if err := view.Register(ocgrpc.DefaultClientViews...); err != nil {
-		log.Warn("Error registering default client views")
-	} else {
-		log.Info("Registered default client views")
-	}
 }
 
 func initTracing() {

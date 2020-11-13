@@ -1,11 +1,11 @@
-# usage: 	./measurement_checkout_var.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY
-# example: 	./measurement_checkout_var.sh experiments/checkout-var 300 20
+# usage: 	./measurement_checkout_const.sh $EXPERIMENT_NAME $LOAD_DURATION $LOAD_INTENSITY
+# example: 	./measurement_checkout_const.sh experiments/checkout 300 20
 
 # Open port 22442 for all VM instances to external!
 
 EXPERIMENT_NAME=$1			# acts as the directory path to store related files to
 LOAD_DURATION=$2 			# in seconds
-LOAD_INTENSITY=$3			# max requests per second
+LOAD_INTENSITY=$3			# requests per second
 
 rm -rf $EXPERIMENT_NAME
 mkdir -p $EXPERIMENT_NAME/training_data
@@ -43,7 +43,12 @@ kubectl get pods -o wide	# show deployment of pods for verification
 
 echo "waiting for system to boot up... (3 minutes)"
 sleep 180
+REDIS_ADDR="$(kubectl -n default get service redis-cart -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):6379"
 FRONTEND_ADDR="$(kubectl -n default get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):8080"
+echo "populating cart data base with ${USER_AMOUNT} carts..."
+cd util/cart-populator-1
+go run populator.go $REDIS_ADDR $USER_AMOUNT
+cd ../..
 echo "generate config files for loadgenerator..."
 # generate user id file
 rm -f $USER_ID_FILE
@@ -54,7 +59,12 @@ do
 done
 # generate load.csv
 rm -f $LOAD
-python3 util/generate_var_load.py $LOAD 0 $LOAD_INTENSITY $LOAD_DURATION
+touch $LOAD
+for ((n=1;n<=$LOAD_DURATION;n++))
+do
+	timestamp=$((n - 1)).5
+	printf "$timestamp,$LOAD_INTENSITY\n" >> $LOAD
+done
 # checkout only lua script
 rm -f $LOAD_SCRIPT
 touch $LOAD_SCRIPT
@@ -84,16 +94,5 @@ python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data paymentserv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data productcatalogservice.csv hipstershop.productcatalogservice.getproduct.csv,hipstershop.productcatalogservice.listproducts.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data recommendationservice.csv hipstershop.recommendationservice.listrecommendations.csv
 python3 util/parse_training_data.py ${EXPERIMENT_NAME}/training_data shippingservice.csv hipstershop.shippingservice.shiporder.csv,hipstershop.shippingservice.getquote.csv
-# generate weka models
-MODEL_TYPE="M5P"
-java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/cartservice.csv ${EXPERIMENT_NAME}/training_data/cartservice.model
-java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/checkoutservice.csv ${EXPERIMENT_NAME}/training_data/checkoutservice.model
-java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/currencyservice.csv ${EXPERIMENT_NAME}/training_data/currencyservice.model
-java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/emailservice.csv ${EXPERIMENT_NAME}/training_data/emailservice.model
-java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/frontend.csv ${EXPERIMENT_NAME}/training_data/frontend.model
-java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/paymentservice.csv ${EXPERIMENT_NAME}/training_data/paymentservice.model
-java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/productcatalogservice.csv ${EXPERIMENT_NAME}/training_data/productcatalogservice.model
-java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/recommendationservice.csv ${EXPERIMENT_NAME}/training_data/recommendationservice.model
-java -jar util/modelgen_weka.jar $MODEL_TYPE ${EXPERIMENT_NAME}/training_data/shippingservice.csv ${EXPERIMENT_NAME}/training_data/shippingservice.model
 echo "finished measurement successfully! All data can be found in ${EXPERIMENT_NAME}."
 gcloud container clusters delete $CLUSTER_NAME --zone=$ZONE --quiet

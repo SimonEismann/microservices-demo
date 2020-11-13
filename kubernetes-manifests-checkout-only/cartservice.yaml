@@ -29,6 +29,8 @@ spec:
       - env:
         - name: PORT
           value: "7070"
+        - name: DUMMY
+          value: isdummy
         - name: DELAY_ADD_ITEM
           value: "200"
         - name: DELAY_GET_CART

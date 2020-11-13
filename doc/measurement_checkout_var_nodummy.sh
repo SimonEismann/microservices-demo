@@ -43,7 +43,12 @@ kubectl get pods -o wide	# show deployment of pods for verification
 
 echo "waiting for system to boot up... (3 minutes)"
 sleep 180
+REDIS_ADDR="$(kubectl -n default get service redis-cart -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):6379"
 FRONTEND_ADDR="$(kubectl -n default get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):8080"
+echo "populating cart data base with ${USER_AMOUNT} carts..."
+cd util/cart-populator-1
+go run populator.go $REDIS_ADDR $USER_AMOUNT
+cd ../..
 echo "generate config files for loadgenerator..."
 # generate user id file
 rm -f $USER_ID_FILE
