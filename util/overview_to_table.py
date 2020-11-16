@@ -68,9 +68,9 @@ for load in LOADS:
         df_rt = df_rt.append(pandas.DataFrame(service_dict_rt, index=[load]))
 
 means = []
-for column in df_util:
-    means.append(df_util[column].mean() * CORE_COUNT * 10)
-df_util = df_util.append(pandas.DataFrame(data=[means], index=["SDL of MEAN"], columns=df_util.columns))
+for column in df_sdl:
+    means.append(df_sdl[column].mean() * CORE_COUNT * 10)
+df_sdl = df_sdl.append(pandas.DataFrame(data=[means], index=["SDL of MEAN"], columns=df_sdl.columns))
 
 with pandas.ExcelWriter('overview_table.xlsx') as writer:
     df_util.to_excel(writer, sheet_name='Utilizations')
