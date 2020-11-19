@@ -44,7 +44,7 @@ for load in LOADS:
             sdl = sdl / (ITEM_AMOUNT_PER_CART + 1)
             print("currencyservice triggered")
         elif k == "productcatalogservice":
-            sdl = sdl / (ITEM_AMOUNT_PER_CART + 1)
+            sdl = sdl / (ITEM_AMOUNT_PER_CART + 2)
             print("productcatalogservice triggered")
         elif k == "shippingservice":
             sdl = sdl / 2
