@@ -225,7 +225,7 @@ func initZipkinTracing() {
 	if err != nil {
 		log.Fatalf("unable to create local endpoint: %+v\n", err)
 	}
-	reporter := zipkinhttp.NewReporter(fmt.Sprintf("http://%s/api/v2/spans", svcAddr), zipkinhttp.BatchInterval(time.Minute * 15), zipkinhttp.BatchSize(60000), zipkinhttp.MaxBacklog(60000))
+	reporter := zipkinhttp.NewReporter(fmt.Sprintf("http://%s/api/v2/spans", svcAddr))
 	exporter := zipkin.NewExporter(reporter, endpoint)
 	trace.RegisterExporter(exporter)
 

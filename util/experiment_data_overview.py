@@ -69,8 +69,7 @@ for index, row in nodemap.iterrows():
 
 zipkin_spans = pd.read_csv(EXPERIMENT_PATH + "/zipkin_spans.csv")
 zipkin_annotations = pd.read_csv(EXPERIMENT_PATH + "/zipkin_annotations.csv")
-client_anns = zipkin_annotations[zipkin_annotations['a_key'].str.startswith("Client")]
-client_anns = client_anns[client_anns['a_value'].str.startswith("true")]
+client_anns = zipkin_annotations[(zipkin_annotations.a_key == "Client") & (zipkin_annotations.a_value == "true")]
 
 
 def getClient(spanID):
