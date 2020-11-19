@@ -108,6 +108,6 @@ for node in nodes:
                 end = start + int(span["duration"])
                 f.write(str(start) + "," + str(end) + "\n")
             f.close()
-        node.response_times[wl] = str(sum(rst) / len(rst)) + "ms"
+        node.response_times[wl] = str(sum(rst) / len(rst)) + "ms (" + str(len(rst)) + ")"
     if not len(node.response_times) == 0:
         print(node.toString())

@@ -6,7 +6,9 @@ LOADS = [5, 10, 15, 20, 25, 30]
 
 PATTERN = re.compile("^(\w+):.+avg\. response time: ([\d\.]+),.*avg\. utilization: ([\d\.]+),.*")
 
-ITEM_AMOUNT_PER_CART = 1
+# config for specific setup
+ITEM_AMOUNT_PER_CART = 1    # how many items are in cart? (constant)
+RECOMMENDATION_AMOUNT = 1   # how many recommendations does frontend show on page? (constant)
 CORE_COUNT = 4
 
 df_util = None
@@ -44,7 +46,7 @@ for load in LOADS:
             sdl = sdl / (ITEM_AMOUNT_PER_CART + 1)
             print("currencyservice triggered")
         elif k == "productcatalogservice":
-            sdl = sdl / (ITEM_AMOUNT_PER_CART + 2)
+            sdl = sdl / (ITEM_AMOUNT_PER_CART + RECOMMENDATION_AMOUNT + 1)
             print("productcatalogservice triggered")
         elif k == "shippingservice":
             sdl = sdl / 2
