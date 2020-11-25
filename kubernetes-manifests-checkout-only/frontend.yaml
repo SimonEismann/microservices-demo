@@ -9,7 +9,7 @@ metadata:
   namespace: default
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 4
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -85,6 +85,9 @@ spec:
             path: /healthz
             port: 8080
           initialDelaySeconds: 10
+        resources:
+          limits:
+            cpu: 1
       serviceAccountName: frontend
       nodeSelector:
         service: frontend

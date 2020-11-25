@@ -9,7 +9,7 @@ metadata:
   namespace: default
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 4
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -57,6 +57,9 @@ spec:
             command:
             - /bin/grpc_health_probe
             - -addr=:8081
+        resources:
+          limits:
+            cpu: 1
       serviceAccountName: recommendationservice
       nodeSelector:
         service: recommendationservice
