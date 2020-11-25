@@ -26,13 +26,11 @@ import (
 	"strconv"
 	"time"
 
+	pb "github.com/SimonEismann/microservices-demo/src/frontend/genproto"
+	"github.com/SimonEismann/microservices-demo/src/frontend/money"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"gonum.org/v1/gonum/mat"
-
-	pb "github.com/SimonEismann/microservices-demo/src/frontend/genproto"
-	"github.com/SimonEismann/microservices-demo/src/frontend/money"
 )
 
 var (
@@ -46,20 +44,28 @@ var (
 func passTime(t int64) {
 	if t <= 0 { return }
 	for i := int64(0); i < t; i++ {
-		a := createMatrix(50)
-		b := createMatrix(50)
-		a.Mul(a,b)
+		a := *createMatrix(50)
+		b := *createMatrix(50)
+		res := make([]float64, 50 * 50)		// res(spalte, zeile) = res[zeile * 50 + spalte], genauso bei a und b
+		for z := 0; z < 50; z++ {			// Zeile
+			for s := 0; s < 50; s++ {		// Spalte
+				dot_product := float64(0)
+				for k := 0; k < 50; k++ {	// spaltenindex von a, zeilenindex von b
+					dot_product += a[z * 50 + k] * b[k * 50 + s]
+				}
+				res[z * 50 + s] = dot_product
+			}
+		}
 	}
 }
 
 // helper function for square matrix generation of passTime(t)
-func createMatrix(size int) *mat.Dense {
+func createMatrix(size int) *[]float64 {
 	data := make([]float64, size * size)
 	for i := range data {
 		data[i] = float64(i)
 	}
-	a := mat.NewDense(size, size, data)
-	return a
+	return &data
 }
 
 func (fe *frontendServer) homeHandler(w http.ResponseWriter, r *http.Request) {

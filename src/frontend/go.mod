@@ -20,7 +20,6 @@ require (
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/sys v0.0.0-20200113162924-86b910548bc1 // indirect
-	gonum.org/v1/gonum v0.8.0
 	google.golang.org/api v0.15.0 // indirect
 	google.golang.org/genproto v0.0.0-20200115191322-ca5a22157cba // indirect
 	google.golang.org/grpc v1.26.0

@@ -35,7 +35,6 @@ import (
 	"go.opencensus.io/plugin/ocgrpc"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
-	"gonum.org/v1/gonum/mat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -73,20 +72,28 @@ func init() {
 func passTime(t int64) {
 	if t <= 0 { return }
 	for i := int64(0); i < t; i++ {
-		a := createMatrix(50)
-		b := createMatrix(50)
-		a.Mul(a,b)
+		a := *createMatrix(50)
+		b := *createMatrix(50)
+		res := make([]float64, 50 * 50)		// res(spalte, zeile) = res[zeile * 50 + spalte], genauso bei a und b
+		for z := 0; z < 50; z++ {			// Zeile
+			for s := 0; s < 50; s++ {		// Spalte
+				dot_product := float64(0)
+				for k := 0; k < 50; k++ {	// spaltenindex von a, zeilenindex von b
+					dot_product += a[z * 50 + k] * b[k * 50 + s]
+				}
+				res[z * 50 + s] = dot_product
+			}
+		}
 	}
 }
 
 // helper function for square matrix generation of passTime(t)
-func createMatrix(size int) *mat.Dense {
+func createMatrix(size int) *[]float64 {
 	data := make([]float64, size * size)
 	for i := range data {
 		data[i] = float64(i)
 	}
-	a := mat.NewDense(size, size, data)
-	return a
+	return &data
 }
 
 type paymentService struct {
