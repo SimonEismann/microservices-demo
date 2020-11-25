@@ -9,7 +9,7 @@ metadata:
   namespace: default
 spec:
   minReadySeconds: 10
-  replicas: 4
+  replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -59,9 +59,6 @@ spec:
             command:
             - /bin/grpc_health_probe
             - -addr=:7072
-        resources:
-          limits:
-            cpu: 1
       serviceAccountName: cartservice
       nodeSelector:
         service: cartservice
