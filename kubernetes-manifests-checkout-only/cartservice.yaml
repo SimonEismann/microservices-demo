@@ -32,11 +32,11 @@ spec:
         - name: DUMMY
           value: isdummy
         - name: DELAY_ADD_ITEM
-          value: "48"
+          value: "46"
         - name: DELAY_GET_CART
-          value: "48"
+          value: "46"
         - name: DELAY_EMPTY_CART
-          value: "48"
+          value: "46"
         - name: REDIS_ADDR
           value: redis-cart:6379
         - name: ZIPKIN_SERVICE_ADDR

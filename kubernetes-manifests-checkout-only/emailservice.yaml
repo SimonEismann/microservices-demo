@@ -30,7 +30,7 @@ spec:
         - name: ENABLE_PROFILER
           value: "0"
         - name: DELAY_SEND_CONFIRMATION
-          value: "108"
+          value: "104"
         - name: HEALTH_PORT
           value: "8081"
         - name: PORT
