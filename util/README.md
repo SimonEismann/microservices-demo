@@ -4,5 +4,5 @@ Fills the redis cart database with carts without using the microservice infrastr
 ## modelgen_weka.jar
 Generates serialized WEKA 3.8.4 regression models from our parsed CSVs (experiment_data_overview.py --> parse_training_data.py --> training data). Can be configured to generate M5P or random forest models. Usage:
 ```shell
-java -jar modelgen_weka.jar [M5P|RandomForest] /path/to/training_data.csv /weka/model/output.model
+java -jar modelgen_weka.jar [M5P|RandomForest|M5Rules|KNN|LinReg|MLPerceptron|SMOReg] /path/to/training_data.csv /weka/model/output.model
 ```
